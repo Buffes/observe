@@ -88,6 +88,7 @@ void PositionCalculator::loadBodies(QString path) {
         }
         this->m_bodies.push_back(current_body); // last item
     }
+    this->m_bodyCount = this->m_bodies.size();
 }
 
 // Method from Paul Schlyter: http://stjarnhimlen.se/comp/ppcomp.html#0
