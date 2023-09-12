@@ -2,23 +2,19 @@ import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
 import QtQuick3D
-import Qt3D.Core
+import QtQuick3D.Helpers
 import observe
 
 Window {
     id: window
-    width: 640
-    height: 480
+    width: 960
+    height: 600
     visible: true
     title: "Hello World"
     color: "#848895"
 
     PositionCalculator {
         id: calculator
-    }
-
-    NodeInstantiator {
-
     }
 
     Node {
@@ -43,17 +39,69 @@ Window {
             }
         }
 
-        Model {
-            source: "#Sphere"
-            materials: [
-                PrincipledMaterial {
-                    baseColor: "#BFBFBF"
-                    metalness: 0.8
-                    roughness: 0.3
-                    opacity: 1.0
-                }
+        ListModel {
+            id: coordinateModel
 
-            ]
+            ListElement {
+
+                name: "saturn"
+                x: 4.22006
+                y: -9.0088
+                z: 0.0323988
+            }
+            ListElement {
+
+                name: "jupiter"
+                x: -0.484747
+                y: 5.49442
+                z: 0.0100939
+            }
+            ListElement {
+
+                name: "venus"
+                x: 0.800765
+                y: -0.240035
+                z: -0.00529978
+            }
+            ListElement {
+
+                name: "mercury"
+                x: 0.513227
+                y: 0.543184
+                z: 0.0386991
+            }
+        }
+
+        component PlanetDelegate : Node {
+            required property string name
+            required property double x
+            required property double y
+            required property double z
+            position: Qt.vector3d(x, y, z)
+
+            Text {
+                text: qsTr(name)
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                font.pixelSize: 1
+            }
+
+            Model {
+                source: "#Sphere"
+                scale: Qt.vector3d(0.01, 0.01, 0.01)
+
+                materials: [ DefaultMaterial {
+                            diffuseColor: "blue"
+                        }
+                    ]
+            }
+
+        }
+
+        Repeater3D {
+            model: coordinateModel
+
+            delegate: PlanetDelegate {}
         }
 
         PerspectiveCamera {
@@ -72,6 +120,10 @@ Window {
             importScene: main_scene
         }
 
+        WasdController {
+            controlledObject: camera
+        }
+
         Column {
             id: controls
             anchors.right: parent.right
@@ -87,10 +139,6 @@ Window {
                     id: slider
                     from: 0.0
                     to: 10.0
-                    onMoved: {
-                        three_values.value1 = value
-                        value_text.text = three_values.value1
-                    }
                 }
 
             Text {

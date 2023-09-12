@@ -51,8 +51,8 @@ struct dVector3D {
 
 class PositionCalculator : public QObject {
     Q_OBJECT
-    Q_PROPERTY(int bodyCount MEMBER m_bodyCount NOTIFY bodyCountChanged)
-    Q_PROPERTY(QList<dVector3D> positions MEMBER m_positions NOTIFY positionsChanged)
+    //Q_PROPERTY(int bodyCount MEMBER m_bodyCount NOTIFY bodyCountChanged)
+    //Q_PROPERTY(QList<dVector3D> positions MEMBER m_positions NOTIFY positionsChanged)
     QML_ELEMENT
 public:
     explicit PositionCalculator(QObject *parent = nullptr);
