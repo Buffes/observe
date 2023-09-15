@@ -17,9 +17,9 @@ qt_add_qml_module(appobserve
     VERSION 1.0
     QML_FILES Main.qml
     SOURCES
-    SOURCES position_calculator.h position_calculator.cpp
-    SOURCES
-    QML_FILES
+    SOURCES calculate_positions.h calculate_positions.cpp
+    SOURCES vector3dlistmodel.h vector3dlistmodel.cpp
+    SOURCES datastructures.h
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

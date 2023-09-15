@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
+import QtQuick.Layouts
 import QtQuick3D
 import QtQuick3D.Helpers
 import observe
@@ -13,8 +14,8 @@ Window {
     title: "Hello World"
     color: "#848895"
 
-    PositionCalculator {
-        id: calculator
+    Vector3DListModel {
+        id: coordinates_model
     }
 
     Node {
@@ -39,7 +40,7 @@ Window {
             }
         }
 
-        ListModel {
+        /*ListModel {
             id: coordinateModel
 
             ListElement {
@@ -70,21 +71,20 @@ Window {
                 y: 0.543184
                 z: 0.0386991
             }
-        }
+        }*/
 
         component PlanetDelegate : Node {
-            required property string name
             required property double x
             required property double y
             required property double z
             position: Qt.vector3d(x, y, z)
 
-            Text {
+            /*Text {
                 text: qsTr(name)
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
                 font.pixelSize: 1
-            }
+            }*/
 
             Model {
                 source: "#Sphere"
@@ -99,7 +99,7 @@ Window {
         }
 
         Repeater3D {
-            model: coordinateModel
+            model: coordinates_model
 
             delegate: PlanetDelegate {}
         }
@@ -136,10 +136,10 @@ Window {
             }
 
             Slider {
-                    id: slider
-                    from: 0.0
-                    to: 10.0
-                }
+                id: slider
+                from: 0.0
+                to: 10.0
+            }
 
             Text {
                 id: value_text
@@ -148,7 +148,36 @@ Window {
 
             Button {
                 text: "Submit"
-                onPressed: calculator.calculatePosition(1990, 4, 19, 0, 0, 0)
+                onPressed: coordinates_model.calculatePositions(1990, 4, 19, 0, 0, 0)
+            }
+
+            GridLayout {
+                columns: 2
+
+                DayOfWeekRow {
+                    locale: grid.locale
+
+                    Layout.column: 1
+                    Layout.fillWidth: true
+                }
+
+                WeekNumberColumn {
+                    month: grid.month
+                    year: grid.year
+                    locale: grid.locale
+
+                    Layout.fillHeight: true
+                }
+
+                MonthGrid {
+                    id: grid
+                    month: Calendar.September
+                    year: 2023
+                    locale: Qt.locale("sv_SE")
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                }
             }
         }
     }

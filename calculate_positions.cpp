@@ -1,6 +1,6 @@
-#include "position_calculator.h"
-#include <QDir>
-#include <QDirIterator>
+#include "datastructures.h"
+#include "calculate_positions.h"
+#include <QDebug>
 #include <QVector3D>
 #include <QtGlobal>
 #include <QtMath>
@@ -30,69 +30,10 @@ OrbitalElements elements_for_day(CelestialBody body, int d) {
     return el;
 }
 
-PositionCalculator::PositionCalculator(QObject *parent) : QObject{parent} {
-    loadBodies("../observe/orbital_elements.txt");
-}
-
-void PositionCalculator::loadBodies(QString path) {
-    QFile file(path);
-    if (!file.exists()) {
-        qWarning() << "Could not find file " << path;
-        return;
-    }
-    if (file.open(QFile::ReadOnly))  {
-        QTextStream in(&file);
-        CelestialBody current_body;
-        while (!in.atEnd()) {
-            QString line = in.readLine();
-            if (line.trimmed().length() == 0) {
-                continue; // skip empty lines
-            }
-            if (line.startsWith("[")) {
-                if (current_body.name.length() > 0) {
-                    this->m_bodies.push_back(current_body);
-                }
-                current_body = {0};
-                current_body.name = line.sliced(1, line.length() - 2);
-            }
-            else {
-                QStringList parts = line.split(",");
-                QString element = parts[0];
-                double base_value = parts[1].toDouble();
-                double delta = parts[2].toDouble();
-                if (element.startsWith("N")) {
-                    current_body.base_elements.N = base_value;
-                    current_body.delta.N = delta;
-                }
-                else if (element.startsWith("i")) {
-                    current_body.base_elements.i = base_value;
-                    current_body.delta.i = delta;
-                }
-                else if (element.startsWith("w")) {
-                    current_body.base_elements.w = base_value;
-                    current_body.delta.w = delta;
-                }
-                else if (element.startsWith("a")) {
-                    current_body.base_elements.a = base_value;
-                    current_body.delta.a = delta;
-                }
-                else if (element.startsWith("e")) {
-                    current_body.base_elements.e = base_value;
-                    current_body.delta.e = delta;
-                }
-                else if (element.startsWith("M")) {
-                    current_body.base_elements.M = base_value;
-                    current_body.delta.M = delta;
-                }
-            }
-        }
-        this->m_bodies.push_back(current_body); // last item
-    }
-    this->m_bodyCount = this->m_bodies.size();
-}
-
 // Method from Paul Schlyter: http://stjarnhimlen.se/comp/ppcomp.html#0
-void PositionCalculator::calculatePosition(int year, int month, int day, int hours, int minutes, int seconds) {
+QList<dVector3D> calc::calculatePositions(QList<CelestialBody> bodies, int year, int month, int day, int hours, int minutes, int seconds) {
+    QList<dVector3D> positions;
+
     // Calculate days since J2000. NOTE: this uses integer divisions
     double d = 367*year -
             7 * ( year + (month+9)/12 ) / 4 -
@@ -123,22 +64,23 @@ void PositionCalculator::calculatePosition(int year, int month, int day, int hou
     double ye = ys * qCos(ecliptic_obliquity);
     double ze = ys * qSin(ecliptic_obliquity);
 
-    double RA  = qAtan2(ye, xe);
-    double dec = qAtan2(ze, qSqrt(xe*xe+ye*ye));
-    RA = qRadiansToDegrees(RA) / 15.0; // RA uses hours, mins, secs.
-    dec = qRadiansToDegrees(dec);
+    positions.append({xe, ye, ze});
+    //double RA  = qAtan2(ye, xe);
+    //double dec = qAtan2(ze, qSqrt(xe*xe+ye*ye));
+    //RA = qRadiansToDegrees(RA) / 15.0; // RA uses hours, mins, secs.
+    //dec = qRadiansToDegrees(dec);
 
     // Compute all orbital elements first
     //QList<OrbitalElements> elements(this->bodies.size());
     QHash<QString, OrbitalElements> elements;
-    for (int i = 0; i < this->m_bodies.size(); i++) {
-        CelestialBody body = this->m_bodies[i];
+    for (int i = 0; i < bodies.size(); i++) {
+        CelestialBody body = bodies[i];
         elements[body.name] = elements_for_day(body, d);
     }
 
     // Compute coordinates
-    for (int i = 0; i < this->m_bodies.size(); i++) {
-        const CelestialBody body = this->m_bodies[i];
+    for (int i = 0; i < bodies.size(); i++) {
+        const CelestialBody body = bodies[i];
         const OrbitalElements el = elements.value(body.name);
 
         if (el.e > 0.98) {
@@ -240,6 +182,7 @@ void PositionCalculator::calculatePosition(int year, int month, int day, int hou
 
         qDebug() << body.name << ": " << xg << ", " << yg << ", " << zg;
 
-        this->m_positions.append({xg, yg, zg});
+        positions.append({xg, yg, zg});
     }
+    return positions;
 }

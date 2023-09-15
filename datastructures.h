@@ -1,8 +1,11 @@
-#ifndef POSITIONCALCULATOR_H
-#define POSITIONCALCULATOR_H
+#ifndef DATASTRUCTURES_H
+#define DATASTRUCTURES_H
 
-#include <QObject>
-#include <QQmlEngine>
+#include <QString>
+
+struct dVector3D {
+    double x, y, z;
+};
 
 struct Coords {
     double rightAscension;
@@ -24,7 +27,7 @@ struct CelestialBody {
     OrbitalElements delta; // change per day since J2000
 };
 
-// The sun is needed for other bodies, so we keep it as a constant
+// The sun is needed for other bodies, so we keep it as a global
 static CelestialBody sun {
     .name = "sun",
     .base_elements = {
@@ -45,24 +48,4 @@ static CelestialBody sun {
     }
 };
 
-struct dVector3D {
-    double x, y, z;
-};
-
-class PositionCalculator : public QObject {
-    Q_OBJECT
-    //Q_PROPERTY(int bodyCount MEMBER m_bodyCount NOTIFY bodyCountChanged)
-    //Q_PROPERTY(QList<dVector3D> positions MEMBER m_positions NOTIFY positionsChanged)
-    QML_ELEMENT
-public:
-    explicit PositionCalculator(QObject *parent = nullptr);
-    int m_bodyCount;
-    QList<CelestialBody> m_bodies;
-    QList<dVector3D> m_positions;
-
-public slots:
-    void loadBodies(QString path);
-    void calculatePosition(int year, int month, int day, int hours, int minutes, int seconds);
-};
-
-#endif // POSITIONCALCULATOR_H
+#endif // DATASTRUCTURES_H
