@@ -148,36 +148,11 @@ Window {
 
             Button {
                 text: "Submit"
-                onPressed: coordinates_model.calculatePositions(1990, 4, 19, 0, 0, 0)
+                onPressed: coordinates_model.calculatePositions(1990, 1, 19, 0, 0, 0)
             }
 
-            GridLayout {
-                columns: 2
-
-                DayOfWeekRow {
-                    locale: grid.locale
-
-                    Layout.column: 1
-                    Layout.fillWidth: true
-                }
-
-                WeekNumberColumn {
-                    month: grid.month
-                    year: grid.year
-                    locale: grid.locale
-
-                    Layout.fillHeight: true
-                }
-
-                MonthGrid {
-                    id: grid
-                    month: Calendar.September
-                    year: 2023
-                    locale: Qt.locale("sv_SE")
-
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                }
+            Calendar {
+                width: parent.width
             }
         }
     }
