@@ -131,7 +131,7 @@ Window {
             spacing: 10
             padding: 10
 
-            TextField {
+            /*TextField {
                 placeholderText: "Write here..."
             }
 
@@ -149,11 +149,9 @@ Window {
             Button {
                 text: "Submit"
                 onPressed: coordinates_model.calculatePositions(1990, 1, 19, 0, 0, 0)
-            }
+            }*/
 
-            Calendar {
-                width: parent.width
-            }
+            MyCalendar {}
         }
     }
 }
