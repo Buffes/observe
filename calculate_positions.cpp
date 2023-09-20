@@ -71,7 +71,6 @@ QList<dVector3D> calc::calculatePositions(QList<CelestialBody> bodies, int year,
     //dec = qRadiansToDegrees(dec);
 
     // Compute all orbital elements first
-    //QList<OrbitalElements> elements(this->bodies.size());
     QHash<QString, OrbitalElements> elements;
     for (int i = 0; i < bodies.size(); i++) {
         CelestialBody body = bodies[i];
@@ -85,6 +84,7 @@ QList<dVector3D> calc::calculatePositions(QList<CelestialBody> bodies, int year,
 
         if (el.e > 0.98) {
             qWarning() << "Too eccentric, we need to use formula for parabolic orbits";
+            continue;
         }
         // Solve Kepler's equation numerically for the eccentric anomaly E
         double E = el.M + el.e * qSin(el.M) * (1.0 + el.e * qCos(el.M));

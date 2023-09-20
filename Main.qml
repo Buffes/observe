@@ -151,7 +151,15 @@ Window {
                 onPressed: coordinates_model.calculatePositions(1990, 1, 19, 0, 0, 0)
             }*/
 
-            MyCalendar {}
+            MyCalendar {
+                id: calendar
+                onDateSelected: date => coordinates_model.calculatePositions(date)
+            }
+
+            Button {
+                text: "Start animation"
+                onPressed: coordinates_model.calculatePositionsRepeatedly(calendar.selected_date)
+            }
         }
     }
 }

@@ -4,6 +4,8 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 Column {
+    id: calendar
+    signal dateSelected(date date)
     Text {
         anchors.horizontalCenter: parent.horizontalCenter
         text: grid.title
@@ -63,72 +65,21 @@ Column {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
+            property var selected_date
+
             delegate: Text {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 opacity: model.month === grid.month ? 1 : 0.5
                 text: model.day
-                font: grid.font
+                font.family: grid.font.family
+                font.pointSize: grid.font.pointSize
 
 
                 required property var model
             }
 
-            onClicked: console.log(date)
+            onClicked: date => calendar.dateSelected(date)
         }
     }
 }
-/*Column {
-    Row {
-        Button {
-            id: prev_month_button
-            width: parent.width * 0.5
-            text: "<"
-        }
-
-        Button {
-            id: next_month_button
-            width: parent.width * 0.5
-            text: ">"
-        }
-    }
-    GridLayout {
-        columns: 2
-        DayOfWeekRow {
-            locale: grid.locale
-
-            Layout.column: 1
-            Layout.fillWidth: true
-        }
-
-        WeekNumberColumn {
-            month: grid.month
-            year: grid.year
-            locale: grid.locale
-
-            Layout.fillHeight: true
-        }
-
-        MonthGrid {
-            id: grid
-            month: Calendar.September
-            year: 2023
-            locale: Qt.locale("sv_SE")
-
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            delegate: Text {
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                opacity: model.month === grid.month ? 1 : 0.5
-                text: model.day
-                font: grid.font
-
-                required property var model
-            }
-
-            onClicked: console.log(date)
-        }
-    }
-}*/

@@ -1,6 +1,7 @@
 #include "vector3dlistmodel.h"
 #include "calculate_positions.h"
 #include <QFile>
+#include <QTimer>
 
 Vector3DListModel::Vector3DListModel(QObject *parent) {
     loadBodies("../observe/orbital_elements.txt");
@@ -91,8 +92,24 @@ QVariant Vector3DListModel::data(const QModelIndex& index, int role) const {
     }
 }
 
-void Vector3DListModel::calculatePositions(int year, int month, int day, int hours, int minutes, int seconds) {
-    QList<dVector3D> positions = calc::calculatePositions(this->m_bodies, year, month, day, hours, minutes, seconds);
+void Vector3DListModel::calculatePositions(QDateTime datetime) {
+    int year  = datetime.date().year();
+    int month = datetime.date().month();
+    int day   = datetime.date().day();
+    int hours = datetime.time().hour();
+    int mins  = datetime.time().minute();
+    int secs  = datetime.time().second();
+
+    QList<dVector3D> positions = calc::calculatePositions(this->m_bodies, year, month, day, hours, mins, secs);
+
+    // The units of the positions are given in AU,
+    /*double scale_factor = 10.0;
+    for (auto &pos : positions) {
+            pos.x *= scale_factor;
+            pos.y *= scale_factor;
+            pos.z *= scale_factor;
+    }*/
+
     if (m_data.size() < positions.size()) {
         beginInsertRows(QModelIndex(), m_data.size(), m_data.size() + positions.size());
         this->m_data = positions;
@@ -102,4 +119,10 @@ void Vector3DListModel::calculatePositions(int year, int month, int day, int hou
         this->m_data = positions;
         emit dataChanged(createIndex(0, 0), createIndex(m_data.size(), 0));
     }
+}
+
+void Vector3DListModel::calculatePositionsRepeatedly(QDateTime start_date) {
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, [=]() {Vector3DListModel::calculatePositions(start_date);});
+    timer->start(1000);
 }

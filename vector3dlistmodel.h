@@ -27,7 +27,9 @@ public:
     void loadBodies(QString path);
 
 public slots:
-    void calculatePositions(int year, int month, int day, int hours, int minutes, int seconds);
+    void calculatePositions(QDateTime date);
+    void calculatePositionsRepeatedly(QDateTime start_date);
+    //void calculatePositions(int year, int month, int day, int hours, int minutes, int seconds);
 
 private:
     QList<dVector3D> m_data;
