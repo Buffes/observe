@@ -6,6 +6,17 @@ import QtQuick3D
 import QtQuick3D.Helpers
 import observe
 
+/*
+Todo list
+- controls for heliocentric/geocentric
+- controls for animation speed and resolution
+- keep the current date as state in the backend
+- different sizes and colors for the planets
+- astronomical map view (RA/declination)
+- make the sun into the scene's light source
+- textures for the planets
+*/
+
 Window {
     id: window
     width: 960
@@ -106,7 +117,7 @@ Window {
 
         PerspectiveCamera {
             id: camera
-            position: Qt.vector3d(0, 0, 400)
+            position: Qt.vector3d(0, 0, 40)
             fieldOfView: 90
         }
     }
@@ -158,7 +169,8 @@ Window {
 
             Button {
                 text: "Start animation"
-                onPressed: coordinates_model.calculatePositionsRepeatedly(calendar.selected_date)
+                checkable: true
+                onToggled: coordinates_model.calculatePositionsRepeatedly()
             }
         }
     }

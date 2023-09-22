@@ -4,7 +4,42 @@
 #include <QObject>
 #include <QQmlEngine>
 #include <QAbstractListModel>
+#include <QThread>
 #include "datastructures.h"
+#include "calculate_positions.h"
+
+class WorkerThread : public QThread {
+    Q_OBJECT
+
+    void run() override {
+        active = true;
+        QDateTime current_date = start_date;
+        while (active) {
+            //qDebug() << "hello";
+            QList<dVector3D> positions = calc::calculatePositions(bodies, current_date);
+            current_date = current_date.addDays(2);
+            emit new_positions(positions);
+            this->msleep(17);
+        }
+    }
+
+public:
+    WorkerThread(QList<CelestialBody> bodies, QDateTime start_date) {
+        this->bodies = bodies;
+        this->start_date = start_date;
+    }
+
+    void disable() {
+        active = false;
+    }
+
+    QList<CelestialBody> bodies;
+    QDateTime start_date;
+    bool active;
+
+signals:
+    void new_positions(QList<dVector3D> positions);
+};
 
 class Vector3DListModel : public QAbstractListModel {
     Q_OBJECT
@@ -28,13 +63,16 @@ public:
 
 public slots:
     void calculatePositions(QDateTime date);
-    void calculatePositionsRepeatedly(QDateTime start_date);
+    void calculatePositionsRepeatedly();
+    void update_positions(QList<dVector3D> positions);
     //void calculatePositions(int year, int month, int day, int hours, int minutes, int seconds);
 
 private:
     QList<dVector3D> m_data;
     QList<CelestialBody> m_bodies;
     int m_bodyCount;
+    double scale_factor;
+    WorkerThread *m_workerThread;
 };
 
 #endif // VECTOR3DLISTMODEL_H

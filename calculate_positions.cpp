@@ -2,6 +2,7 @@
 #include "calculate_positions.h"
 #include <QDebug>
 #include <QVector3D>
+#include <QDateTime>
 #include <QtGlobal>
 #include <QtMath>
 
@@ -31,7 +32,14 @@ OrbitalElements elements_for_day(CelestialBody body, int d) {
 }
 
 // Method from Paul Schlyter: http://stjarnhimlen.se/comp/ppcomp.html#0
-QList<dVector3D> calc::calculatePositions(QList<CelestialBody> bodies, int year, int month, int day, int hours, int minutes, int seconds) {
+QList<dVector3D> calc::calculatePositions(QList<CelestialBody> bodies, QDateTime datetime) {
+    int year  = datetime.date().year();
+    int month = datetime.date().month();
+    int day   = datetime.date().day();
+    int hours = datetime.time().hour();
+    int mins  = datetime.time().minute();
+    int secs  = datetime.time().second();
+
     QList<dVector3D> positions;
 
     // Calculate days since J2000. NOTE: this uses integer divisions
@@ -40,9 +48,9 @@ QList<dVector3D> calc::calculatePositions(QList<CelestialBody> bodies, int year,
             3 * ( ( year + (month-9)/7 ) / 100 + 1 ) / 4 +
             275*month/9 + day - 730515;
 
-    double decimal_hours = hours + minutes / 60.0 + seconds / 3600.0;
+    double decimal_hours = hours + mins / 60.0 + secs / 3600.0;
     d += decimal_hours / 24.0;
-    qDebug() << "day: " << d;
+    //qDebug() << "day: " << d;
 
     double ecliptic_obliquity = qDegreesToRadians(23.4393 - 3.563E-7 * d);
 
@@ -167,20 +175,32 @@ QList<dVector3D> calc::calculatePositions(QList<CelestialBody> bodies, int year,
         lon_ecl = qDegreesToRadians(lon_ecl);
         lat_ecl = qDegreesToRadians(lat_ecl);
 
-        // heliocentric, ecliptic
+        // heliocentric, ecliptic. For the moon this is geocentric.
         xh = r * qCos(lon_ecl) * qCos(lat_ecl);
         yh = r * qSin(lon_ecl) * qCos(lat_ecl);
         zh = r                 * qSin(lat_ecl);
 
-        double xs = r_sun * cos(lon_sun);
-        double ys = r_sun * sin(lon_sun);
+        double xg;
+        double yg;
+        double zg;
 
-        // geocentric, ecliptic
-        double xg = xh + xs;
-        double yg = yh + ys;
-        double zg = zh;
+        if (body.name == "moon") {
+            // Already in geocentric. We just convert from Earth radii to AU.
+            xg = xh * 4.258750455597227e-5;
+            yg = yh * 4.258750455597227e-5;
+            zg = zh * 4.258750455597227e-5;
+        }
+        else {
+            double xs = r_sun * cos(lon_sun);
+            double ys = r_sun * sin(lon_sun);
 
-        qDebug() << body.name << ": " << xg << ", " << yg << ", " << zg;
+            // geocentric, ecliptic
+            xg = xh;// + xs;
+            yg = yh;// + ys;
+            zg = zh;
+        }
+
+        //qDebug() << body.name << ": " << xg << ", " << yg << ", " << zg;
 
         positions.append({xg, yg, zg});
     }

@@ -1,11 +1,15 @@
 #include "vector3dlistmodel.h"
 #include "calculate_positions.h"
 #include <QFile>
-#include <QTimer>
+#include <QThread>
 
 Vector3DListModel::Vector3DListModel(QObject *parent) {
     loadBodies("../observe/orbital_elements.txt");
     m_data.reserve(m_bodyCount + 1);
+    scale_factor = 5.0;
+    m_workerThread = new WorkerThread(m_bodies, QDateTime::currentDateTime());
+    QObject::connect(m_workerThread, &WorkerThread::new_positions,
+                     this, &Vector3DListModel::update_positions);
 }
 
 void Vector3DListModel::loadBodies(QString path) {
@@ -92,37 +96,34 @@ QVariant Vector3DListModel::data(const QModelIndex& index, int role) const {
     }
 }
 
-void Vector3DListModel::calculatePositions(QDateTime datetime) {
-    int year  = datetime.date().year();
-    int month = datetime.date().month();
-    int day   = datetime.date().day();
-    int hours = datetime.time().hour();
-    int mins  = datetime.time().minute();
-    int secs  = datetime.time().second();
-
-    QList<dVector3D> positions = calc::calculatePositions(this->m_bodies, year, month, day, hours, mins, secs);
-
-    // The units of the positions are given in AU,
-    /*double scale_factor = 10.0;
-    for (auto &pos : positions) {
+void Vector3DListModel::update_positions(QList<dVector3D> positions) {
+    // scale positions for visualization purposes. units in are AU
+    // TODO: Moon's units are earth radii, fix this
+    for (dVector3D &pos : positions) {
             pos.x *= scale_factor;
             pos.y *= scale_factor;
             pos.z *= scale_factor;
-    }*/
+    }
 
     if (m_data.size() < positions.size()) {
-        beginInsertRows(QModelIndex(), m_data.size(), m_data.size() + positions.size());
-        this->m_data = positions;
-        endInsertRows();
+            beginInsertRows(QModelIndex(), m_data.size(), m_data.size() + positions.size());
+            this->m_data = positions;
+            endInsertRows();
     }
     else {
-        this->m_data = positions;
-        emit dataChanged(createIndex(0, 0), createIndex(m_data.size(), 0));
+            this->m_data = positions;
+            emit dataChanged(createIndex(0, 0), createIndex(m_data.size(), 0));
     }
 }
 
-void Vector3DListModel::calculatePositionsRepeatedly(QDateTime start_date) {
-    QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, [=]() {Vector3DListModel::calculatePositions(start_date);});
-    timer->start(1000);
+void Vector3DListModel::calculatePositions(QDateTime datetime) {
+    QList<dVector3D> positions = calc::calculatePositions(this->m_bodies, datetime);
+    update_positions(positions);
+}
+
+void Vector3DListModel::calculatePositionsRepeatedly() {
+    if (!m_workerThread->active)
+        m_workerThread->start();
+    else
+        m_workerThread->disable();
 }
