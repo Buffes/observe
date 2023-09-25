@@ -91,6 +91,8 @@ QVariant Vector3DListModel::data(const QModelIndex& index, int role) const {
             return m_data[index.row()].y;
         case ZRole:
             return m_data[index.row()].z;
+        case ColorRole:
+
         default:
             return QVariant();
     }

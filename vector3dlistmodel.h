@@ -42,6 +42,14 @@ signals:
     void new_positions(QList<dVector3D> positions);
 };
 
+
+enum Visualization {
+    Heliocentric,
+    Geocentric,
+    StarChart,
+};
+
+
 class Vector3DListModel : public QAbstractListModel {
     Q_OBJECT
     QML_ELEMENT
@@ -69,16 +77,14 @@ public slots:
     //void calculatePositions(int year, int month, int day, int hours, int minutes, int seconds);
 
 private:
+    // data for each planet. More or less stored in AoS
     QList<dVector3D> m_data;
     QList<CelestialBody> m_bodies;
+    QList<
     WorkerThread *m_workerThread;
     int m_bodyCount;
     double scale_factor;
-    enum visualization {
-        Heliocentric,
-        Geocentric,
-        StarChart,
-    };
+    Visualization visualization;
 };
 
 #endif // VECTOR3DLISTMODEL_H

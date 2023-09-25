@@ -88,6 +88,7 @@ Window {
             required property double x
             required property double y
             required property double z
+            required property
             position: Qt.vector3d(x, y, z)
 
             /*Text {
