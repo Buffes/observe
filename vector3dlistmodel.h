@@ -24,7 +24,8 @@ class WorkerThread : public QThread {
     }
 
 public:
-    WorkerThread(QList<CelestialBody> bodies, QDateTime start_date) {
+    WorkerThread(QList<CelestialBody> bodies, QDateTime start_date, QObject *parent = 0)
+    : QThread(parent) {
         this->bodies = bodies;
         this->start_date = start_date;
     }
@@ -48,6 +49,7 @@ class Vector3DListModel : public QAbstractListModel {
 public:
     // Model related things
     Vector3DListModel(QObject *parent = 0);
+    //  ~Vector3DListModel();
     QHash<int, QByteArray> roleNames() const;
     int rowCount(const QModelIndex& parent = QModelIndex()) const;
     QVariant data(const QModelIndex& index, int role) const;
@@ -56,7 +58,6 @@ public:
         XRole=Qt::UserRole+1,
         YRole,
         ZRole,
-
     };
 
     void loadBodies(QString path);
@@ -70,9 +71,14 @@ public slots:
 private:
     QList<dVector3D> m_data;
     QList<CelestialBody> m_bodies;
+    WorkerThread *m_workerThread;
     int m_bodyCount;
     double scale_factor;
-    WorkerThread *m_workerThread;
+    enum visualization {
+        Heliocentric,
+        Geocentric,
+        StarChart,
+    };
 };
 
 #endif // VECTOR3DLISTMODEL_H
