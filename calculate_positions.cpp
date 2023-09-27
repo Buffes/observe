@@ -31,7 +31,9 @@ OrbitalElements elements_for_day(CelestialBody body, int d) {
     return el;
 }
 
+
 // Method from Paul Schlyter: http://stjarnhimlen.se/comp/ppcomp.html#0
+// Bodies is a list of CelestialBody, where the first is assumed to be the sun.
 QList<dVector3D> calc::calculatePositions(QList<CelestialBody> bodies, QDateTime datetime) {
     int year  = datetime.date().year();
     int month = datetime.date().month();
@@ -55,6 +57,7 @@ QList<dVector3D> calc::calculatePositions(QList<CelestialBody> bodies, QDateTime
     double ecliptic_obliquity = qDegreesToRadians(23.4393 - 3.563E-7 * d);
 
     // Compute for the sun first, because it is needed for the other bodies, and simpler to compute.
+    CelestialBody sun = bodies[0];
     OrbitalElements sun_el = elements_for_day(sun, d);
     double E_sun = sun_el.M + sun_el.e * qSin(sun_el.M) * (1.0 + sun_el.e * qCos(sun_el.M));
 
@@ -80,13 +83,13 @@ QList<dVector3D> calc::calculatePositions(QList<CelestialBody> bodies, QDateTime
 
     // Compute all orbital elements first
     QHash<QString, OrbitalElements> elements;
-    for (int i = 0; i < bodies.size(); i++) {
+    for (int i = 1; i < bodies.size(); i++) {
         CelestialBody body = bodies[i];
         elements[body.name] = elements_for_day(body, d);
     }
 
     // Compute coordinates
-    for (int i = 0; i < bodies.size(); i++) {
+    for (int i = 1; i < bodies.size(); i++) {
         const CelestialBody body = bodies[i];
         const OrbitalElements el = elements.value(body.name);
 
@@ -185,7 +188,7 @@ QList<dVector3D> calc::calculatePositions(QList<CelestialBody> bodies, QDateTime
         double zg;
 
         if (body.name == "moon") {
-            // Already in geocentric. We just convert from Earth radii to AU.
+            // The moon is already in geocentric. We just convert from Earth radii to AU.
             xg = xh * 4.258750455597227e-5;
             yg = yh * 4.258750455597227e-5;
             zg = zh * 4.258750455597227e-5;
@@ -195,8 +198,8 @@ QList<dVector3D> calc::calculatePositions(QList<CelestialBody> bodies, QDateTime
             double ys = r_sun * sin(lon_sun);
 
             // geocentric, ecliptic
-            xg = xh;// + xs;
-            yg = yh;// + ys;
+            xg = xh + xs;
+            yg = yh + ys;
             zg = zh;
         }
 

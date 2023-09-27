@@ -13,11 +13,10 @@ class WorkerThread : public QThread {
 
     void run() override {
         active = true;
-        QDateTime current_date = start_date;
         while (active) {
             //qDebug() << "hello";
-            QList<dVector3D> positions = calc::calculatePositions(bodies, current_date);
-            current_date = current_date.addDays(2);
+            QList<dVector3D> positions = calc::calculatePositions(bodies, date);
+            date = date.addDays(2);
             emit new_positions(positions);
             this->msleep(17);
         }
@@ -27,7 +26,7 @@ public:
     WorkerThread(QList<CelestialBody> bodies, QDateTime start_date, QObject *parent = 0)
     : QThread(parent) {
         this->bodies = bodies;
-        this->start_date = start_date;
+        this->date = start_date;
     }
 
     void disable() {
@@ -35,11 +34,16 @@ public:
     }
 
     QList<CelestialBody> bodies;
-    QDateTime start_date;
+    QDateTime date;
     bool active;
 
 signals:
     void new_positions(QList<dVector3D> positions);
+
+public slots:
+    void set_date(QDateTime datetime) {
+        this->date = datetime;
+    }
 };
 
 
@@ -66,6 +70,7 @@ public:
         XRole=Qt::UserRole+1,
         YRole,
         ZRole,
+        ColorRole,
     };
 
     void loadBodies(QString path);
@@ -76,11 +81,13 @@ public slots:
     void update_positions(QList<dVector3D> positions);
     //void calculatePositions(int year, int month, int day, int hours, int minutes, int seconds);
 
+signals:
+    void new_date_input(QDateTime datetime);
+
 private:
-    // data for each planet. More or less stored in AoS
+    // data for each planet.
     QList<dVector3D> m_data;
     QList<CelestialBody> m_bodies;
-    QList<
     WorkerThread *m_workerThread;
     int m_bodyCount;
     double scale_factor;

@@ -11,7 +11,7 @@ Todo list
 - controls for heliocentric/geocentric
 - controls for animation speed and resolution
 - keep the current date as state in the backend
-- different sizes and colors for the planets
+- different sizes for the planets
 - astronomical map view (RA/declination)
 - make the sun into the scene's light source
 - textures for the planets
@@ -88,7 +88,7 @@ Window {
             required property double x
             required property double y
             required property double z
-            required property
+            required property color p_color;
             position: Qt.vector3d(x, y, z)
 
             /*Text {
@@ -103,7 +103,7 @@ Window {
                 scale: Qt.vector3d(0.01, 0.01, 0.01)
 
                 materials: [ DefaultMaterial {
-                            diffuseColor: "blue"
+                            diffuseColor: p_color
                         }
                     ]
             }
@@ -134,6 +134,7 @@ Window {
 
         WasdController {
             controlledObject: camera
+            speed: 0.1
         }
 
         Column {

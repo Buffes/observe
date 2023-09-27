@@ -5,11 +5,13 @@
 
 Vector3DListModel::Vector3DListModel(QObject *parent) {
     loadBodies("../observe/orbital_elements.txt");
-    m_data.reserve(m_bodyCount + 1);
+    m_data.reserve(m_bodyCount);
     scale_factor = 5.0;
     m_workerThread = new WorkerThread(m_bodies, QDateTime::currentDateTime());
     QObject::connect(m_workerThread, &WorkerThread::new_positions,
                      this, &Vector3DListModel::update_positions);
+    QObject::connect(this, &Vector3DListModel::new_date_input,
+                     m_workerThread, &WorkerThread::set_date);
 }
 
 void Vector3DListModel::loadBodies(QString path) {
@@ -23,8 +25,8 @@ void Vector3DListModel::loadBodies(QString path) {
          CelestialBody current_body;
          while (!in.atEnd()) {
              QString line = in.readLine();
-             if (line.trimmed().length() == 0) {
-                 continue; // skip empty lines
+             if (line.trimmed().length() == 0 || line.startsWith("//")) {
+                 continue; // skip empty lines and comments
              }
              if (line.startsWith("[")) {
                  if (current_body.name.length() > 0) {
@@ -62,6 +64,9 @@ void Vector3DListModel::loadBodies(QString path) {
                      current_body.base_elements.M = base_value;
                      current_body.delta.M = delta;
                  }
+                 else if (element.startsWith("color")) {
+                     current_body.color = QColor(parts[1].toInt(), parts[2].toInt(), parts[3].toInt());
+                 }
              }
          }
          this->m_bodies.push_back(current_body); // last item
@@ -74,6 +79,7 @@ QHash<int, QByteArray> Vector3DListModel::roleNames() const {
     roles[XRole] = "x";
     roles[YRole] = "y";
     roles[ZRole] = "z";
+    roles[ColorRole] = "p_color";
     return roles;
 }
 
@@ -84,6 +90,7 @@ int Vector3DListModel::rowCount(const QModelIndex& parent) const {
 QVariant Vector3DListModel::data(const QModelIndex& index, int role) const {
     if (!index.isValid() || index.row() >= m_data.size())
         return QVariant();
+    QVariant v;
     switch (role) {
         case XRole:
             return m_data[index.row()].x;
@@ -92,7 +99,8 @@ QVariant Vector3DListModel::data(const QModelIndex& index, int role) const {
         case ZRole:
             return m_data[index.row()].z;
         case ColorRole:
-
+            v = m_bodies[index.row()].color;
+            return v;
         default:
             return QVariant();
     }
@@ -100,7 +108,6 @@ QVariant Vector3DListModel::data(const QModelIndex& index, int role) const {
 
 void Vector3DListModel::update_positions(QList<dVector3D> positions) {
     // scale positions for visualization purposes. units in are AU
-    // TODO: Moon's units are earth radii, fix this
     for (dVector3D &pos : positions) {
             pos.x *= scale_factor;
             pos.y *= scale_factor;
@@ -108,19 +115,22 @@ void Vector3DListModel::update_positions(QList<dVector3D> positions) {
     }
 
     if (m_data.size() < positions.size()) {
-            beginInsertRows(QModelIndex(), m_data.size(), m_data.size() + positions.size());
+            beginInsertRows(QModelIndex(), m_data.size(), m_data.size() + positions.size() - 1);
             this->m_data = positions;
             endInsertRows();
     }
     else {
             this->m_data = positions;
-            emit dataChanged(createIndex(0, 0), createIndex(m_data.size(), 0));
+            emit dataChanged(createIndex(0, 0), createIndex(m_data.size()-1, 0));
     }
 }
 
 void Vector3DListModel::calculatePositions(QDateTime datetime) {
-    QList<dVector3D> positions = calc::calculatePositions(this->m_bodies, datetime);
-    update_positions(positions);
+    emit new_date_input(datetime);
+    if (!m_workerThread->active) {
+        QList<dVector3D> positions = calc::calculatePositions(this->m_bodies, datetime);
+        update_positions(positions);
+    }
 }
 
 void Vector3DListModel::calculatePositionsRepeatedly() {
