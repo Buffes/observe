@@ -203,9 +203,19 @@ QList<dVector3D> calc::calculatePositions(QList<CelestialBody> bodies, QDateTime
             zg = zh;
         }
 
+        // geocentric, equatorial
+        double xe = xg;
+        double ye = yg * qCos(ecliptic_obliquity) - zg * qSin(ecliptic_obliquity);
+        double ze = yg * qSin(ecliptic_obliquity) - zg * qCos(ecliptic_obliquity);
+
+        double len = qSqrt(xe*xe + ye*ye + ze*ze);
+        xe *= 1.0 / len;
+        ye *= 1.0 / len;
+        ze *= 1.0 / len;
+
         //qDebug() << body.name << ": " << xg << ", " << yg << ", " << zg;
 
-        positions.append({xg, yg, zg});
+        positions.append({xe, ye, ze});
     }
     return positions;
 }

@@ -6,7 +6,7 @@
 Vector3DListModel::Vector3DListModel(QObject *parent) {
     loadBodies("../observe/orbital_elements.txt");
     m_data.reserve(m_bodyCount);
-    scale_factor = 5.0;
+    scale_factor = 25.0;
     m_workerThread = new WorkerThread(m_bodies, QDateTime::currentDateTime());
     QObject::connect(m_workerThread, &WorkerThread::new_positions,
                      this, &Vector3DListModel::update_positions);

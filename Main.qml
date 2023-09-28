@@ -10,7 +10,6 @@ import observe
 Todo list
 - controls for heliocentric/geocentric
 - controls for animation speed and resolution
-- keep the current date as state in the backend
 - different sizes for the planets
 - astronomical map view (RA/declination)
 - make the sun into the scene's light source
@@ -118,7 +117,8 @@ Window {
 
         PerspectiveCamera {
             id: camera
-            position: Qt.vector3d(0, 0, 40)
+            position: Qt.vector3d(0, 0, 0)
+            eulerRotation.y: -90
             fieldOfView: 90
         }
     }
