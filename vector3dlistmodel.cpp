@@ -92,12 +92,13 @@ QVariant Vector3DListModel::data(const QModelIndex& index, int role) const {
         return QVariant();
     QVariant v;
     switch (role) {
+        // NOTE: QML seems to only support +Y as up. The math uses +Z. So we swap them here.
         case XRole:
             return m_data[index.row()].x;
         case YRole:
-            return m_data[index.row()].y;
-        case ZRole:
             return m_data[index.row()].z;
+        case ZRole:
+            return m_data[index.row()].y;
         case ColorRole:
             v = m_bodies[index.row()].color;
             return v;

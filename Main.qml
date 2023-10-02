@@ -50,39 +50,6 @@ Window {
             }
         }
 
-        /*ListModel {
-            id: coordinateModel
-
-            ListElement {
-
-                name: "saturn"
-                x: 4.22006
-                y: -9.0088
-                z: 0.0323988
-            }
-            ListElement {
-
-                name: "jupiter"
-                x: -0.484747
-                y: 5.49442
-                z: 0.0100939
-            }
-            ListElement {
-
-                name: "venus"
-                x: 0.800765
-                y: -0.240035
-                z: -0.00529978
-            }
-            ListElement {
-
-                name: "mercury"
-                x: 0.513227
-                y: 0.543184
-                z: 0.0386991
-            }
-        }*/
-
         component PlanetDelegate : Node {
             required property double x
             required property double y
@@ -118,7 +85,6 @@ Window {
         PerspectiveCamera {
             id: camera
             position: Qt.vector3d(0, 0, 0)
-            eulerRotation.y: -90
             fieldOfView: 90
         }
     }
@@ -130,6 +96,12 @@ Window {
         View3D {
             anchors.fill: parent
             importScene: main_scene
+            environment: SceneEnvironment {
+                backgroundMode: SceneEnvironment.SkyBox
+                lightProbe: Texture {
+                    source: "qrc:kloofendal_43d_clear_4k.ktx"
+                }
+            }
         }
 
         WasdController {

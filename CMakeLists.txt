@@ -15,13 +15,21 @@ qt_add_executable(appobserve
 qt_add_qml_module(appobserve
     URI observe
     VERSION 1.0
-    QML_FILES Main.qml
-    SOURCES
     SOURCES calculate_positions.h calculate_positions.cpp
     SOURCES vector3dlistmodel.h vector3dlistmodel.cpp
     SOURCES datastructures.h
-    QML_FILES MyCalendar.qml
+    QML_FILES
+        Main.qml
+        MyCalendar.qml
+        RESOURCES images.qrc
 )
+
+#qt_add_resources(appobserve
+#    "images"
+#    PREFIX "/"
+#    FILES
+#        "kloofendal_43d_clear_4k.ktx"
+#)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
