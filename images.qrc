@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>kloofendal_43d_clear_4k.ktx</file>
+        <file>fish.png</file>
+        <file>empty_workshop_4k.exr</file>
     </qresource>
 </RCC>

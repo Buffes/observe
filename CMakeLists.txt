@@ -8,8 +8,23 @@ find_package(Qt6 6.5 REQUIRED COMPONENTS Core Gui Quick Quick3D)
 
 qt_standard_project_setup(REQUIRES 6.5)
 
+set(CMAKE_AUTORCC ON)
+
 qt_add_executable(appobserve
+    #images.qrc
     main.cpp
+)
+
+qt6_add_lightprobe_images(appobserve "assets"
+    PREFIX "/img"
+    FILES
+        "empty_workshop_4k.exr"
+)
+
+qt_add_resources(appobserve "assets"
+    PREFIX "/img"
+    FILES
+        "hdr.png"
 )
 
 qt_add_qml_module(appobserve
@@ -21,15 +36,7 @@ qt_add_qml_module(appobserve
     QML_FILES
         Main.qml
         MyCalendar.qml
-        RESOURCES images.qrc
 )
-
-#qt_add_resources(appobserve
-#    "images"
-#    PREFIX "/"
-#    FILES
-#        "kloofendal_43d_clear_4k.ktx"
-#)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an

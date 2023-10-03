@@ -1,3 +1,4 @@
+import Qt.labs.folderlistmodel
 import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
@@ -14,6 +15,7 @@ Todo list
 - astronomical map view (RA/declination)
 - make the sun into the scene's light source
 - textures for the planets
+- load star positions from here http://tdc-www.harvard.edu/catalogs/bsc5.html
 */
 
 Window {
@@ -99,7 +101,7 @@ Window {
             environment: SceneEnvironment {
                 backgroundMode: SceneEnvironment.SkyBox
                 lightProbe: Texture {
-                    source: "qrc:kloofendal_43d_clear_4k.ktx"
+                    source: "qrc:/img/hdr.png"
                 }
             }
         }
@@ -115,6 +117,7 @@ Window {
             width: parent.width * 0.25
             spacing: 10
             padding: 10
+
 
             /*TextField {
                 placeholderText: "Write here..."
