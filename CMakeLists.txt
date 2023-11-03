@@ -19,13 +19,15 @@ qt6_add_lightprobe_images(appobserve "assets"
     PREFIX "/img"
     FILES
         "empty_workshop_4k.exr"
+    OUTPUTS
+        "skybox.ktx"
 )
 
-qt_add_resources(appobserve "assets"
-    PREFIX "/img"
-    FILES
-        "hdr.png"
-)
+#qt_add_resources(appobserve "assets"
+#    PREFIX "/img"
+#    FILES
+#        "hdr.png"
+#)
 
 qt_add_qml_module(appobserve
     URI observe

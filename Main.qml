@@ -14,8 +14,8 @@ Todo list
 - different sizes for the planets
 - astronomical map view (RA/declination)
 - make the sun into the scene's light source
+- load star positions from here http://tdc-www.harvard.edu/catalogs/bsc5.html and generate background with stars
 - textures for the planets
-- load star positions from here http://tdc-www.harvard.edu/catalogs/bsc5.html
 */
 
 Window {
@@ -98,12 +98,12 @@ Window {
         View3D {
             anchors.fill: parent
             importScene: main_scene
-            environment: SceneEnvironment {
+            /*environment: SceneEnvironment {
                 backgroundMode: SceneEnvironment.SkyBox
                 lightProbe: Texture {
-                    source: "qrc:/img/hdr.png"
+                    source: "qrc:/img/skybox.ktx"
                 }
-            }
+            }*/
         }
 
         WasdController {
@@ -111,47 +111,52 @@ Window {
             speed: 0.1
         }
 
-        Column {
-            id: controls
-            anchors.right: parent.right
+        Rectangle {
+            id: gui_background
             width: parent.width * 0.25
-            spacing: 10
-            padding: 10
+            height: parent.height
+            color: mouse.hovered ? "#a9a9a9" : "tomato"
+            anchors.right: parent.right
 
-
-            /*TextField {
-                placeholderText: "Write here..."
+            HoverHandler {
+                id: mouse
             }
 
-            Slider {
-                id: slider
-                from: 0.0
-                to: 10.0
-            }
+            Column {
+                id: controls
+                width: parent.width
+                spacing: 10
+                padding: 10
 
-            Text {
-                id: value_text
-                text: "0.0"
-            }
+                MyCalendar {
+                    id: calendar
+                    onDateSelected: date => coordinates_model.calculatePositions(date)
+                }
 
-            Button {
-                text: "Submit"
-                onPressed: coordinates_model.calculatePositions(1990, 1, 19, 0, 0, 0)
-            }*/
+                Button {
+                    text: "Start animation"
+                    checkable: true
+                    onToggled: coordinates_model.calculatePositionsRepeatedly()
+                }
 
-            MyCalendar {
-                id: calendar
-                onDateSelected: date => coordinates_model.calculatePositions(date)
-            }
+                Slider {
+                    id: animation_speed_slider
+                    value: 1
+                    from: 0.5
+                    to: 5
+                    //stepSize: 0.5
+                    //snapMode: Slider.SnapOnRelease
 
-            Button {
-                text: "Start animation"
-                checkable: true
-                onToggled: coordinates_model.calculatePositionsRepeatedly()
-            }
+                    signal valueChanged(float value)
 
-            RadioButton {
-                text: "hello"
+                    Component.onCompleted: animation_speed_slider.valueChanged.connect(coordinates_model.animation_speed_changed)
+
+                    onMoved: animation_speed_slider.valueChanged(value)
+                }
+
+                RadioButton {
+                    text: "hello"
+                }
             }
         }
     }

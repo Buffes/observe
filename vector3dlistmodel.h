@@ -16,7 +16,7 @@ class WorkerThread : public QThread {
         while (active) {
             //qDebug() << "hello";
             QList<dVector3D> positions = calc::calculatePositions(bodies, date);
-            date = date.addDays(2);
+            date = date.addSecs(secs_per_update);
             emit new_positions(positions);
             this->msleep(17);
         }
@@ -27,15 +27,21 @@ public:
     : QThread(parent) {
         this->bodies = bodies;
         this->date = start_date;
+        this->secs_per_update = 3600 * 24;
     }
 
     void disable() {
         active = false;
     }
 
+    void set_speed(float speed) {
+        this->secs_per_update = (unsigned long)(3600.0 * 24.0 * speed);
+    }
+
     QList<CelestialBody> bodies;
     QDateTime date;
     bool active;
+    int64_t secs_per_update;
 
 signals:
     void new_positions(QList<dVector3D> positions);
@@ -79,6 +85,7 @@ public slots:
     void calculatePositions(QDateTime date);
     void calculatePositionsRepeatedly();
     void update_positions(QList<dVector3D> positions);
+    void set_animation_speed(float value);
     //void calculatePositions(int year, int month, int day, int hours, int minutes, int seconds);
 
 signals:

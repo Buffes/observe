@@ -140,3 +140,7 @@ void Vector3DListModel::calculatePositionsRepeatedly() {
     else
         m_workerThread->disable();
 }
+
+void Vector3DListModel::set_animation_speed(float value) {
+    m_workerThread->set_speed(value);
+}
