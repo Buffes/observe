@@ -11,8 +11,8 @@ double normalizeAngle(double angle) {
     else            return fmod(angle, 360.0) + 360;
 }
 
-// d is the day since 2000, calculated separately
-OrbitalElements elements_for_day(CelestialBody body, int d) {
+// d is the days since 2000 expressed as a decimal number, calculated separately.
+OrbitalElements elements_for_day(CelestialBody body, double d) {
     OrbitalElements el;
     el = body.base_elements;
     el.N += d * body.delta.N;
@@ -52,7 +52,6 @@ QList<dVector3D> calc::calculatePositions(QList<CelestialBody> bodies, QDateTime
 
     double decimal_hours = hours + mins / 60.0 + secs / 3600.0;
     d += decimal_hours / 24.0;
-    //qDebug() << "day: " << d;
 
     double ecliptic_obliquity = qDegreesToRadians(23.4393 - 3.563E-7 * d);
 

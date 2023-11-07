@@ -23,7 +23,7 @@ Window {
     width: 960
     height: 600
     visible: true
-    title: "Hello World"
+    title: "Celestial Position Calculator"
     color: "#848895"
 
     Vector3DListModel {
@@ -35,21 +35,8 @@ Window {
 
         PointLight {
             id: point_light
-            position: Qt.vector3d(-200, 200, 200)
-            brightness: 20
-
-            SequentialAnimation on x {
-                loops: Animation.Infinite
-
-                PropertyAnimation {
-                    to: 200
-                    duration: 3000
-                }
-                PropertyAnimation {
-                    to: -200
-                    duration: 3000
-                }
-            }
+            position: Qt.vector3d(0, 0, 0)
+            brightness: 1
         }
 
         component PlanetDelegate : Node {
@@ -131,27 +118,33 @@ Window {
                 MyCalendar {
                     id: calendar
                     onDateSelected: date => coordinates_model.calculatePositions(date)
+                    titleFont.bold: true
+                    titleFont.pointSize: 13.0
+                }
+
+                Text {
+                    id: animation_speed_title
+                    text: "Animation speed"
+                    font.bold: true
+                    font.pointSize: 13.0
+                }
+
+                Slider {
+                    id: animation_speed_slider
+                    value: 0.3
+                    from: 0.05
+                    to: 2.0
+                    width: parent.width * 0.9
+                    //stepSize: 0.5
+                    //snapMode: Slider.SnapOnRelease
+
+                    onMoved: coordinates_model.set_animation_speed(animation_speed_slider.value)
                 }
 
                 Button {
                     text: "Start animation"
                     checkable: true
                     onToggled: coordinates_model.calculatePositionsRepeatedly()
-                }
-
-                Slider {
-                    id: animation_speed_slider
-                    value: 1
-                    from: 0.5
-                    to: 5
-                    //stepSize: 0.5
-                    //snapMode: Slider.SnapOnRelease
-
-                    signal valueChanged(float value)
-
-                    Component.onCompleted: animation_speed_slider.valueChanged.connect(coordinates_model.animation_speed_changed)
-
-                    onMoved: animation_speed_slider.valueChanged(value)
                 }
 
                 RadioButton {

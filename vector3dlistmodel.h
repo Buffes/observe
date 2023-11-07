@@ -7,6 +7,7 @@
 #include <QThread>
 #include "datastructures.h"
 #include "calculate_positions.h"
+#include <time.h>
 
 class WorkerThread : public QThread {
     Q_OBJECT
@@ -14,11 +15,10 @@ class WorkerThread : public QThread {
     void run() override {
         active = true;
         while (active) {
-            //qDebug() << "hello";
             QList<dVector3D> positions = calc::calculatePositions(bodies, date);
             date = date.addSecs(secs_per_update);
             emit new_positions(positions);
-            this->msleep(17);
+            this->msleep(16);
         }
     }
 
@@ -34,8 +34,8 @@ public:
         active = false;
     }
 
-    void set_speed(float speed) {
-        this->secs_per_update = (unsigned long)(3600.0 * 24.0 * speed);
+    void set_speed(double speed) {
+        this->secs_per_update = (int64_t)(3600.0 * 24.0 * speed);
     }
 
     QList<CelestialBody> bodies;
@@ -85,7 +85,7 @@ public slots:
     void calculatePositions(QDateTime date);
     void calculatePositionsRepeatedly();
     void update_positions(QList<dVector3D> positions);
-    void set_animation_speed(float value);
+    void set_animation_speed(double value);
     //void calculatePositions(int year, int month, int day, int hours, int minutes, int seconds);
 
 signals:

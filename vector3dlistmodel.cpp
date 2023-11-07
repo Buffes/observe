@@ -14,6 +14,19 @@ Vector3DListModel::Vector3DListModel(QObject *parent) {
                      m_workerThread, &WorkerThread::set_date);
 }
 
+void loadStarCatalog(QString path) {
+    QFile file(path);
+    if (!file.exists()) {
+        qWarning() << "Could not find file " << path;
+        return;
+    }
+
+    QByteArray bytes = file.readAll();
+
+
+
+}
+
 void Vector3DListModel::loadBodies(QString path) {
      QFile file(path);
      if (!file.exists()) {
@@ -141,6 +154,6 @@ void Vector3DListModel::calculatePositionsRepeatedly() {
         m_workerThread->disable();
 }
 
-void Vector3DListModel::set_animation_speed(float value) {
+void Vector3DListModel::set_animation_speed(double value) {
     m_workerThread->set_speed(value);
 }

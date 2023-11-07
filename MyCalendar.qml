@@ -6,9 +6,12 @@ import QtQuick.Layouts
 Column {
     id: calendar
     signal dateSelected(date date)
+    property font titleFont
+
     Text {
         anchors.horizontalCenter: parent.horizontalCenter
         text: grid.title
+        font: titleFont
     }
 
     Row {
