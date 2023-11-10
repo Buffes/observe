@@ -1,33 +1,20 @@
-#include "vector3dlistmodel.h"
+#include "planetmodel.h"
 #include "calculate_positions.h"
 #include <QFile>
 #include <QThread>
 
-Vector3DListModel::Vector3DListModel(QObject *parent) {
+PlanetModel::PlanetModel(QObject *parent) {
     loadBodies("../observe/orbital_elements.txt");
     m_data.reserve(m_bodyCount);
     scale_factor = 25.0;
     m_workerThread = new WorkerThread(m_bodies, QDateTime::currentDateTime());
     QObject::connect(m_workerThread, &WorkerThread::new_positions,
-                     this, &Vector3DListModel::update_positions);
-    QObject::connect(this, &Vector3DListModel::new_date_input,
+                     this, &PlanetModel::update_positions);
+    QObject::connect(this, &PlanetModel::new_date_input,
                      m_workerThread, &WorkerThread::set_date);
 }
 
-void loadStarCatalog(QString path) {
-    QFile file(path);
-    if (!file.exists()) {
-        qWarning() << "Could not find file " << path;
-        return;
-    }
-
-    QByteArray bytes = file.readAll();
-
-
-
-}
-
-void Vector3DListModel::loadBodies(QString path) {
+void PlanetModel::loadBodies(QString path) {
      QFile file(path);
      if (!file.exists()) {
          qWarning() << "Could not find file " << path;
@@ -87,7 +74,7 @@ void Vector3DListModel::loadBodies(QString path) {
      this->m_bodyCount += this->m_bodies.size();
 }
 
-QHash<int, QByteArray> Vector3DListModel::roleNames() const {
+QHash<int, QByteArray> PlanetModel::roleNames() const {
     QHash<int, QByteArray> roles;
     roles[XRole] = "x";
     roles[YRole] = "y";
@@ -96,11 +83,11 @@ QHash<int, QByteArray> Vector3DListModel::roleNames() const {
     return roles;
 }
 
-int Vector3DListModel::rowCount(const QModelIndex& parent) const {
+int PlanetModel::rowCount(const QModelIndex& parent) const {
     return m_data.size();
 }
 
-QVariant Vector3DListModel::data(const QModelIndex& index, int role) const {
+QVariant PlanetModel::data(const QModelIndex& index, int role) const {
     if (!index.isValid() || index.row() >= m_data.size())
         return QVariant();
     QVariant v;
@@ -120,7 +107,7 @@ QVariant Vector3DListModel::data(const QModelIndex& index, int role) const {
     }
 }
 
-void Vector3DListModel::update_positions(QList<dVector3D> positions) {
+void PlanetModel::update_positions(QList<dVector3D> positions) {
     // scale positions for visualization purposes. units in are AU
     for (dVector3D &pos : positions) {
             pos.x *= scale_factor;
@@ -139,7 +126,7 @@ void Vector3DListModel::update_positions(QList<dVector3D> positions) {
     }
 }
 
-void Vector3DListModel::calculatePositions(QDateTime datetime) {
+void PlanetModel::calculatePositions(QDateTime datetime) {
     emit new_date_input(datetime);
     if (!m_workerThread->active) {
         QList<dVector3D> positions = calc::calculatePositions(this->m_bodies, datetime);
@@ -147,13 +134,13 @@ void Vector3DListModel::calculatePositions(QDateTime datetime) {
     }
 }
 
-void Vector3DListModel::calculatePositionsRepeatedly() {
+void PlanetModel::calculatePositionsRepeatedly() {
     if (!m_workerThread->active)
         m_workerThread->start();
     else
         m_workerThread->disable();
 }
 
-void Vector3DListModel::set_animation_speed(double value) {
+void PlanetModel::set_animation_speed(double value) {
     m_workerThread->set_speed(value);
 }

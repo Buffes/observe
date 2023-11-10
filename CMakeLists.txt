@@ -33,11 +33,19 @@ qt_add_qml_module(appobserve
     URI observe
     VERSION 1.0
     SOURCES calculate_positions.h calculate_positions.cpp
-    SOURCES vector3dlistmodel.h vector3dlistmodel.cpp
+    SOURCES planetmodel.h planetmodel.cpp
+    SOURCES starInstanceTable.h starInstanceTable.cpp
     SOURCES datastructures.h
     QML_FILES
         Main.qml
         MyCalendar.qml
+)
+
+qt_add_resources(appobserve "shaders"
+    PREFIX "/shaders"
+    FILES
+        "star.vert"
+        "star.frag"
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

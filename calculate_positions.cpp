@@ -6,9 +6,16 @@
 #include <QtGlobal>
 #include <QtMath>
 
-double normalizeAngle(double angle) {
-    if (angle >= 0) return fmod(angle, 360.0);
-    else            return fmod(angle, 360.0) + 360;
+#define TWO_PI 6.283185
+
+double normalizeDegrees(double degrees) {
+    if (degrees >= 0) return fmod(degrees, 360.0);
+    else              return fmod(degrees, 360.0) + 360;
+}
+
+double normalizeRadians(double radians) {
+    if (radians >= 0) return fmod(radians, TWO_PI);
+    else              return fmod(radians, TWO_PI) + TWO_PI;
 }
 
 // d is the days since 2000 expressed as a decimal number, calculated separately.
@@ -23,10 +30,10 @@ OrbitalElements elements_for_day(CelestialBody body, double d) {
     el.M += d * body.delta.M;
 
     // all angles need to be radians and in [0,2pi]
-    el.N = qDegreesToRadians(normalizeAngle(el.N));
-    el.i = qDegreesToRadians(normalizeAngle(el.i));
-    el.w = qDegreesToRadians(normalizeAngle(el.w));
-    el.M = qDegreesToRadians(normalizeAngle(el.M));
+    el.N = qDegreesToRadians(normalizeDegrees(el.N));
+    el.i = qDegreesToRadians(normalizeDegrees(el.i));
+    el.w = qDegreesToRadians(normalizeDegrees(el.w));
+    el.M = qDegreesToRadians(normalizeDegrees(el.M));
 
     return el;
 }
@@ -217,4 +224,15 @@ QList<dVector3D> calc::calculatePositions(QList<CelestialBody> bodies, QDateTime
         positions.append({xe, ye, ze});
     }
     return positions;
+}
+
+
+dVector3D calc::RADeclinationToCartesian(double RA, double declination, double distance) {
+    dVector3D result = {
+        .x = distance * qCos(declination) * qCos(RA),
+        .y = distance * qCos(declination) * qSin(RA),
+        .z = distance * qSin(declination)
+    };
+
+    return result;
 }

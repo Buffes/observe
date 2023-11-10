@@ -1,5 +1,5 @@
-#ifndef VECTOR3DLISTMODEL_H
-#define VECTOR3DLISTMODEL_H
+#ifndef PLANETMODEL_H
+#define PLANETMODEL_H
 
 #include <QObject>
 #include <QQmlEngine>
@@ -59,14 +59,13 @@ enum Visualization {
     StarChart,
 };
 
-
-class Vector3DListModel : public QAbstractListModel {
+class PlanetModel : public QAbstractListModel {
     Q_OBJECT
     QML_ELEMENT
 
 public:
     // Model related things
-    Vector3DListModel(QObject *parent = 0);
+    PlanetModel(QObject *parent = 0);
     //  ~Vector3DListModel();
     QHash<int, QByteArray> roleNames() const;
     int rowCount(const QModelIndex& parent = QModelIndex()) const;
@@ -80,6 +79,7 @@ public:
     };
 
     void loadBodies(QString path);
+    void loadStarCatalog(QString path);
 
 public slots:
     void calculatePositions(QDateTime date);
@@ -101,4 +101,4 @@ private:
     Visualization visualization;
 };
 
-#endif // VECTOR3DLISTMODEL_H
+#endif // PLANETMODEL_H

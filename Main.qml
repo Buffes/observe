@@ -5,6 +5,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick3D
 import QtQuick3D.Helpers
+import QtQuick3D.Particles3D
 import observe
 
 /*
@@ -20,13 +21,13 @@ Todo list
 
 Window {
     id: window
-    width: 960
-    height: 600
+    width: 1440
+    height: 900
     visible: true
     title: "Celestial Position Calculator"
     color: "#848895"
 
-    Vector3DListModel {
+    PlanetModel {
         id: coordinates_model
     }
 
@@ -62,13 +63,45 @@ Window {
                         }
                     ]
             }
-
         }
+
+        /*component StarDelegate : Node {
+            required property double x
+            required property double y
+            required property double z
+            position: Qt.vector3d(x, y, z)
+
+            Rectangle {
+                anchors.horizontalCenter: parent.horizontalCenter
+                color: "white"
+                width: 1
+                height: 1
+            }
+        }
+        */
 
         Repeater3D {
             model: coordinates_model
-
             delegate: PlanetDelegate {}
+        }
+
+        CustomMaterial {
+            id: star_material
+
+            vertexShader: "qrc:/shaders/star.vert"
+            fragmentShader: "qrc:/shaders/star.frag"
+        }
+
+        Model {
+            id: instanced_star_quad
+            property real size: 1
+            scale: Qt.vector3d(size/100, size/100, size/100)
+            source: "#Rectangle"
+            instancing: StarInstanceTable {
+
+            }
+
+            materials: [star_material]
         }
 
         PerspectiveCamera {
@@ -81,7 +114,7 @@ Window {
     Rectangle {
         id: main_area
         anchors.fill: parent
-        color: "#cafebabe"
+        color: "black"
         View3D {
             anchors.fill: parent
             importScene: main_scene
@@ -100,7 +133,7 @@ Window {
 
         Rectangle {
             id: gui_background
-            width: parent.width * 0.25
+            width: parent.width * 0.2
             height: parent.height
             color: mouse.hovered ? "#a9a9a9" : "tomato"
             anchors.right: parent.right
