@@ -87,7 +87,7 @@ Window {
 
         CustomMaterial {
             id: star_material
-
+            shadingMode: CustomMaterial.Unshaded
             vertexShader: "qrc:/shaders/star.vert"
             fragmentShader: "qrc:/shaders/star.frag"
         }
