@@ -7,9 +7,8 @@
 
 namespace calc {
     QList<dVector3D> calculatePositions(QList<CelestialBody> bodies, QDateTime datetime);
-
-    // Right ascension and declination expressed in radians.
-    dVector3D RADeclinationToCartesian(double RA, double declination, double distance);
+    dVector3D RADeclinationToCartesian(double RA, double declination, double distance); // Right ascension and declination expressed in radians.
+    float magnitudeToScale(int16_t magnitude, int16_t max_magnitude = -124);
 }
 
 #endif // POSITIONCALCULATOR_H

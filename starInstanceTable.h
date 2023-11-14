@@ -14,6 +14,7 @@ struct StarEntry {
     int16_t magnitude;
     float proper_motion_ra;
     float proper_motion_decl;
+    float scale;
 };
 
 /*

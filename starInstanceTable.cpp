@@ -57,8 +57,11 @@ void StarInstanceTable::loadStarCatalog(QString path) {
             entry.proper_motion_decl = readType<float>(bytes, &idx);
             entry.proper_motion_ra   = readType<float>(bytes, &idx);
 
+            entry.scale = calc::magnitudeToScale(entry.magnitude);
+
             m_stars.append(entry);
             m_cartesian_coords.append(calc::RADeclinationToCartesian(entry.right_ascension, entry.declination, 200.0));
+
         }
     }
 }
@@ -96,8 +99,9 @@ QByteArray StarInstanceTable::getInstanceBuffer(int *instanceCount) {
     if (m_dirty) {
         for (int i = 0; i < m_stars.length(); i++) {
             dVector3D pos = m_cartesian_coords[i];
+            float scale = m_stars[i].scale;
 
-            auto entry = calculateTableEntry({(float)pos.x, (float)pos.y, (float)pos.z}, {1, 1, 1}, {1, 1, 1}, QColor(255, 255, 255), {});
+            auto entry = calculateTableEntry({(float)pos.x, (float)pos.y, (float)pos.z}, {1, 1, 1/*scale, scale, scale*/}, {1, 1, 1}, QColor(255, 255, 255), {scale, 0, 0, 0});
             m_instanceData.append((char*)&entry, sizeof(entry));
         }
         m_instanceCount = m_stars.length();

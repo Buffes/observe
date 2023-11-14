@@ -8,6 +8,10 @@ struct dVector3D {
     double x, y, z;
 };
 
+struct Color {
+    uint16_t r, g, b;
+};
+
 struct Coords {
     double rightAscension;
     double declination;
