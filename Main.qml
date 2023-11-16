@@ -94,12 +94,8 @@ Window {
 
         Model {
             id: instanced_star_quad
-            property real size: 1
-            scale: Qt.vector3d(size/100, size/100, size/100)
             source: "#Rectangle"
-            instancing: StarInstanceTable {
-
-            }
+            instancing: StarInstanceTable {}
 
             materials: [star_material]
         }
@@ -115,15 +111,27 @@ Window {
         id: main_area
         anchors.fill: parent
         color: "black"
+
+        MouseArea {
+            id: main_mouse
+            anchors.fill: parent
+
+            onWheel: event => {
+                         let new_fov = camera.fieldOfView - event.angleDelta.y * 0.05;
+                         camera.fieldOfView = Math.max(10.0, Math.min(150.0, new_fov));
+                     }
+        }
+
         View3D {
             anchors.fill: parent
             importScene: main_scene
-            /*environment: SceneEnvironment {
+            environment: SceneEnvironment {
                 backgroundMode: SceneEnvironment.SkyBox
                 lightProbe: Texture {
-                    source: "qrc:/img/skybox.ktx"
+                    //source: "qrc:/hdr/skybox.ktx"
+                    source: "qrc:/img/constellation_figures_4k.tif"
                 }
-            }*/
+            }
         }
 
         WasdController {
@@ -135,11 +143,24 @@ Window {
             id: gui_background
             width: parent.width * 0.2
             height: parent.height
-            color: mouse.hovered ? "#a9a9a9" : "tomato"
+            color: "#FFa9a9a9"
+            opacity: 0.25
             anchors.right: parent.right
 
             HoverHandler {
-                id: mouse
+                id: controls_mouse
+            }
+
+            states: State {
+                name: "hovered"; when: controls_mouse.hovered
+                PropertyChanges {
+                    target: gui_background
+                    opacity: 1.0
+                }
+            }
+
+            transitions: Transition {
+                NumberAnimation { properties: "opacity"; easing.type: Easing.InOutQuad; duration: 150 }
             }
 
             Column {

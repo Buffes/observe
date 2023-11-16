@@ -236,10 +236,12 @@ QList<dVector3D> calc::calculatePositions(QList<CelestialBody> bodies, QDateTime
 
 
 dVector3D calc::RADeclinationToCartesian(double RA, double declination, double distance) {
+    // NOTE: The Y axis is treated as the Earths rotational axis here.
+    // Celestial coordinates
     dVector3D result = {
         .x = distance * qCos(declination) * qCos(RA),
         .y = distance * qSin(declination),
-        .z = distance * qCos(declination) * qSin(RA)
+        .z = -distance * qCos(declination) * qSin(RA)
     };
 
     return result;
@@ -249,14 +251,14 @@ float calc::magnitudeToScale(int16_t magnitude, int16_t max_magnitude) {
     // The magnitude scale is inverse logarithmic. We set a reference size for magnitude 1,
     // and then calculate the color from the difference in magnitude.
 
-    float start_size = 0.01;
+    float start_size = 0.02f;
     int16_t magnitude_diff = 100 - magnitude; // NOTE: the 16 bit number is 100 times the actual magnitude.
 
     float brightness_diff = powf(10.0f, 0.01f * 0.4f * magnitude_diff);
     float max_brightness_diff = powf(10.0f, 0.01f * 0.4f * (100 - max_magnitude));
 
-    float min = 0.006;
-    float max = 10.0;
+    float min = 0.004f;
+    float max = 5.0f;
     float range = max - min;
 
     float result = start_size * brightness_diff * (range / max_brightness_diff) + min;

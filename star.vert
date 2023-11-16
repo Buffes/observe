@@ -1,6 +1,5 @@
-void MAIN()
-{
-    float scale = INSTANCE_DATA.x;
+void MAIN() {
+    float scale = INSTANCE_DATA.w;
 
     mat4 modelview_matrix_billboard = VIEW_MATRIX * INSTANCE_MODEL_MATRIX;
     modelview_matrix_billboard[0][0] = scale;

@@ -1,5 +1,5 @@
-#ifndef POSITIONCALCULATOR_H
-#define POSITIONCALCULATOR_H
+#ifndef CALCULATEPOSITIONS_H
+#define CALCULATEPOSITIONS_H
 
 #include <QList>
 #include <QDateTime>
@@ -11,4 +11,4 @@ namespace calc {
     float magnitudeToScale(int16_t magnitude, int16_t max_magnitude = -124);
 }
 
-#endif // POSITIONCALCULATOR_H
+#endif // CALCULATEPOSITIONS_H

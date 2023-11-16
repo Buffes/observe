@@ -101,7 +101,13 @@ QByteArray StarInstanceTable::getInstanceBuffer(int *instanceCount) {
             dVector3D pos = m_cartesian_coords[i];
             float scale = m_stars[i].scale;
 
-            auto entry = calculateTableEntry({(float)pos.x, (float)pos.y, (float)pos.z}, {1, 1, 1/*scale, scale, scale*/}, {1, 1, 1}, QColor(255, 255, 255), {scale, 0, 0, 0});
+            auto entry = calculateTableEntry(
+                {(float)pos.x, (float)pos.y, (float)pos.z},
+                {1, 1, 1},
+                {1, 1, 1},
+                QColor(255, 255, 255),
+                {(float)pos.x, (float)pos.y, (float)pos.z, scale}
+            );
             m_instanceData.append((char*)&entry, sizeof(entry));
         }
         m_instanceCount = m_stars.length();

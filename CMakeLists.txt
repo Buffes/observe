@@ -15,19 +15,22 @@ qt_add_executable(appobserve
     main.cpp
 )
 
-#qt6_add_lightprobe_images(appobserve "assets"
-#    PREFIX "/img"
-#    FILES
-#        "empty_workshop_4k.exr"
-#    OUTPUTS
-#        "skybox.ktx"
-#)
+qt6_add_lightprobe_images(appobserve "hdrs"
+    PREFIX "/hdr"
+    FILES
+        "milkyway_2020_4k.exr"
+    OUTPUTS
+        "skybox.ktx"
+)
 
-#qt_add_resources(appobserve "assets"
-#    PREFIX "/img"
-#    FILES
-#        "hdr.png"
-#)
+qt_add_resources(appobserve "assets"
+    PREFIX "/img"
+    FILES
+        "fish.png"
+        "celestial_grid_16k_print.jpg"
+        "celestial_grid_16k.tif"
+        "constellation_figures_4k.tif"
+)
 
 qt_add_qml_module(appobserve
     URI observe

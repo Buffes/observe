@@ -61,28 +61,34 @@ Column {
 
         MonthGrid {
             id: grid
-            month: Calendar.September
-            year: 2023
+            month: grid.selected_date.getMonth()
+            year: grid.selected_date.getFullYear()
             locale: Qt.locale("en_SE")
 
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            property var selected_date
+            property var selected_date: new Date();
 
             delegate: Text {
+                id: month_day_text
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 opacity: model.month === grid.month ? 1 : 0.5
                 text: model.day
                 font.family: grid.font.family
                 font.pointSize: grid.font.pointSize
-
+                color: model.day === grid.selected_date.getDate() && model.month === grid.selected_date.getMonth() ? "red" : "black"
 
                 required property var model
             }
 
-            onClicked: date => calendar.dateSelected(date)
+            onClicked: date => {
+                           grid.selected_date = date;
+                           calendar.dateSelected(date);
+                       }
+
+            Component.onCompleted: calendar.dateSelected(grid.selected_date);
         }
     }
 }
