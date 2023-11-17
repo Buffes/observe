@@ -15,7 +15,6 @@ Todo list
 - different sizes for the planets
 - astronomical map view (RA/declination)
 - make the sun into the scene's light source
-- load star positions from here http://tdc-www.harvard.edu/catalogs/bsc5.html and generate background with stars
 - textures for the planets
 */
 
@@ -120,11 +119,17 @@ Window {
                          let new_fov = camera.fieldOfView - event.angleDelta.y * 0.05;
                          camera.fieldOfView = Math.max(10.0, Math.min(150.0, new_fov));
                      }
+
+            onClicked: event => {
+                           console.log(main_view3d.mapTo3DScene(Qt.vector3d(event.x, event.y, test_field.text)));
+                       }
         }
 
         View3D {
+            id: main_view3d
             anchors.fill: parent
             importScene: main_scene
+            camera: camera
             environment: SceneEnvironment {
                 backgroundMode: SceneEnvironment.SkyBox
                 lightProbe: Texture {
@@ -134,10 +139,10 @@ Window {
             }
         }
 
-        WasdController {
+        /*WasdController {
             controlledObject: camera
             speed: 0.1
-        }
+        }*/
 
         Rectangle {
             id: gui_background
@@ -171,6 +176,7 @@ Window {
 
                 MyCalendar {
                     id: calendar
+                    anchors.horizontalCenter: parent.horizontalCenter
                     onDateSelected: date => coordinates_model.calculatePositions(date)
                     titleFont.bold: true
                     titleFont.pointSize: 13.0
@@ -178,6 +184,7 @@ Window {
 
                 Text {
                     id: animation_speed_title
+
                     text: "Animation speed"
                     font.bold: true
                     font.pointSize: 13.0
@@ -199,6 +206,11 @@ Window {
                     text: "Start animation"
                     checkable: true
                     onToggled: coordinates_model.calculatePositionsRepeatedly()
+                }
+
+                TextField {
+                    id: test_field
+
                 }
 
                 RadioButton {

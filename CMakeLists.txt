@@ -15,23 +15,6 @@ qt_add_executable(appobserve
     main.cpp
 )
 
-qt6_add_lightprobe_images(appobserve "hdrs"
-    PREFIX "/hdr"
-    FILES
-        "milkyway_2020_4k.exr"
-    OUTPUTS
-        "skybox.ktx"
-)
-
-qt_add_resources(appobserve "assets"
-    PREFIX "/img"
-    FILES
-        "fish.png"
-        "celestial_grid_16k_print.jpg"
-        "celestial_grid_16k.tif"
-        "constellation_figures_4k.tif"
-)
-
 qt_add_qml_module(appobserve
     URI observe
     VERSION 1.0
@@ -44,12 +27,30 @@ qt_add_qml_module(appobserve
         MyCalendar.qml
 )
 
+
+qt_add_resources(appobserve "assets"
+    PREFIX "/img"
+    FILES
+#        "fish.png"
+#        "celestial_grid_16k_print.jpg"
+#        "celestial_grid_16k.tif"
+        "constellation_figures_4k.tif"
+)
+
 qt_add_resources(appobserve "shaders"
     PREFIX "/shaders"
     FILES
         "star.vert"
         "star.frag"
 )
+
+#qt6_add_lightprobe_images(appobserve "hdrs"
+#    PREFIX "/hdr"
+#    FILES
+#        "milkyway_2020_4k.exr"
+#    OUTPUTS
+#        "skybox.ktx"
+#)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an

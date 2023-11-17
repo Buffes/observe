@@ -236,8 +236,9 @@ QList<dVector3D> calc::calculatePositions(QList<CelestialBody> bodies, QDateTime
 
 
 dVector3D calc::RADeclinationToCartesian(double RA, double declination, double distance) {
-    // NOTE: The Y axis is treated as the Earths rotational axis here.
-    // Celestial coordinates
+    // NOTE: For OpenGL compatibility we want a right handed system with Y axis as up.
+    // The coordinates we get are in a RHS with Z axis up. Thus we rotate by 90 degrees
+    // around the X axis, which is the same as swapping Y and Z, and then negating Z.
     dVector3D result = {
         .x = distance * qCos(declination) * qCos(RA),
         .y = distance * qSin(declination),

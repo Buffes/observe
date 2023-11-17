@@ -91,4 +91,22 @@ Column {
             Component.onCompleted: calendar.dateSelected(grid.selected_date);
         }
     }
+
+    SpinBox {
+        editable: true
+        from: 0
+        to: 24
+        stepSize: 1
+    }
+
+    Button {
+
+        text: "Set to today"
+        onClicked: {
+            let today = new Date();
+            grid.selected_date = today;
+            calendar.dateSelected(today);
+
+       }
+    }
 }
