@@ -5,7 +5,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick3D
 import QtQuick3D.Helpers
-import QtQuick3D.Particles3D
 import observe
 
 /*
@@ -111,20 +110,6 @@ Window {
         anchors.fill: parent
         color: "black"
 
-        MouseArea {
-            id: main_mouse
-            anchors.fill: parent
-
-            onWheel: event => {
-                         let new_fov = camera.fieldOfView - event.angleDelta.y * 0.05;
-                         camera.fieldOfView = Math.max(10.0, Math.min(150.0, new_fov));
-                     }
-
-            onClicked: event => {
-                           console.log(main_view3d.mapTo3DScene(Qt.vector3d(event.x, event.y, test_field.text)));
-                       }
-        }
-
         View3D {
             id: main_view3d
             anchors.fill: parent
@@ -139,10 +124,27 @@ Window {
             }
         }
 
-        /*WasdController {
+        WasdController {
             controlledObject: camera
             speed: 0.1
-        }*/
+        }
+
+        MouseArea {
+            id: main_mouse
+            anchors.fill: parent
+
+            property real last_x
+            property real last_y
+
+            onWheel: event => {
+                         let new_fov = camera.fieldOfView - event.angleDelta.y * 0.05;
+                         camera.fieldOfView = Math.max(10.0, Math.min(150.0, new_fov));
+                     }
+
+            onClicked: event => {
+                           console.log(main_view3d.mapTo3DScene(Qt.vector3d(event.x, event.y, test_field.text)));
+                       }
+        }
 
         Rectangle {
             id: gui_background

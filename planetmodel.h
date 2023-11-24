@@ -5,6 +5,8 @@
 #include <QQmlEngine>
 #include <QAbstractListModel>
 #include <QThread>
+#include <QDeadlineTimer>
+#include <QElapsedTimer>
 #include "datastructures.h"
 #include "calculate_positions.h"
 #include <time.h>
@@ -14,11 +16,21 @@ class WorkerThread : public QThread {
 
     void run() override {
         active = true;
+
         while (active) {
+            QDeadlineTimer deadline(16); // 60 fps is about 16.67 ms
             QList<dVector3D> positions = calc::calculatePositions(bodies, date);
             date = date.addSecs(secs_per_update);
             emit new_positions(positions);
-            this->msleep(16);
+
+            qint64 time_left = deadline.remainingTime();
+            if (time_left > 0) {
+                this->msleep(time_left - 1);
+
+                while (!deadline.hasExpired()) {
+                    // spin last millisecond to avoid overshooting.
+                }
+            }
         }
     }
 

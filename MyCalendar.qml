@@ -17,15 +17,23 @@ Column {
     Row {
         anchors.horizontalCenter: parent.horizontalCenter
         Button {
+           text: "❮❮"
+           width: 40
+           onClicked: {
+               grid.year -= 1;
+           }
+        }
+
+        Button {
            text: "❮"
            width: 40
            onClicked: {
-               var month = grid.month - 1
+               var month = grid.month - 1;
                if (month < 0) {
-                   month = 11
-                   grid.year -= 1 // NOTE: doesn't handle the BC/AD divide properly.
+                   month = 11;
+                   grid.year -= 1; // NOTE: doesn't handle the BC/AD divide properly.
                }
-               grid.month = month
+               grid.month = month;
            }
         }
 
@@ -33,12 +41,20 @@ Column {
            text: "❯"
            width: 40
            onClicked: {
-               var month = grid.month + 1
+               var month = grid.month + 1;
                if (month > 11) {
-                   month = 0
-                   grid.year += 1
+                   month = 0;
+                   grid.year += 1;
                }
-               grid.month = month
+               grid.month = month;
+           }
+        }
+
+        Button {
+           text: "❯❯"
+           width: 40
+           onClicked: {
+               grid.year += 1;
            }
         }
     }

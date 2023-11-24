@@ -68,6 +68,7 @@ target_link_libraries(appobserve PUBLIC
     Qt6::Gui
     Qt6::Quick
     Qt6::Quick3D
+    winmm.lib # for timeBeginPeriod
 )
 
 include(GNUInstallDirs)
