@@ -251,17 +251,15 @@ QList<dVector3D> calc::calculatePositions(QList<CelestialBody> bodies, QDateTime
         ye *= 1.0 / len;
         ze *= 1.0 / len;
 
-        //qDebug() << body.name << ": " << xg << ", " << yg << ", " << zg;
-
         positions.append({xe, ye, ze});
 
         //if (body.name == "jupiter") {
-            double RA   = atan2(ye, xe);
-            double decl = atan2(ze, sqrt(xe*xe + ye*ye));
-            qDebug() << body.name;
-            printRightAscension(RA);
-            printDeclination(decl);
-            qDebug() << "";
+        //    double RA   = atan2(ye, xe);
+        //    double decl = atan2(ze, sqrt(xe*xe + ye*ye));
+        //    qDebug() << body.name;
+        //    printRightAscension(RA);
+        //    printDeclination(decl);
+        //    qDebug() << "";
         //}
     }
     return positions;

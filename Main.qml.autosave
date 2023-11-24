@@ -9,12 +9,14 @@ import observe
 
 /*
 Todo list
+- rewrite planet repeater to use instancing like the star
+- selection of objects and information showing up.
+- texture for the stars
 - controls for heliocentric/geocentric
-- controls for animation speed and resolution
 - different sizes for the planets
 - astronomical map view (RA/declination)
 - make the sun into the scene's light source
-- textures for the planets
+- textures for the planets - 
 */
 
 Window {

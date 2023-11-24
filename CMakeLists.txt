@@ -22,6 +22,7 @@ qt_add_qml_module(appobserve
     SOURCES planetmodel.h planetmodel.cpp
     SOURCES starInstanceTable.h starInstanceTable.cpp
     SOURCES datastructures.h
+    SOURCES selectionhandler.h selectionhandler.cpp
     QML_FILES
         Main.qml
         MyCalendar.qml
