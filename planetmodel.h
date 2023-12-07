@@ -7,9 +7,11 @@
 #include <QThread>
 #include <QDeadlineTimer>
 #include <QElapsedTimer>
+#include <time.h>
 #include "datastructures.h"
 #include "calculate_positions.h"
-#include <time.h>
+#include "datamanager.h"
+
 
 class WorkerThread : public QThread {
     Q_OBJECT
@@ -83,32 +85,26 @@ public:
     int rowCount(const QModelIndex& parent = QModelIndex()) const;
     QVariant data(const QModelIndex& index, int role) const;
 
-    enum CustomRoles{
+    enum CustomRoles {
         XRole=Qt::UserRole+1,
         YRole,
         ZRole,
         ColorRole,
     };
 
-    void loadBodies(QString path);
-    void loadStarCatalog(QString path);
-
 public slots:
     void calculatePositions(QDateTime date);
     void calculatePositionsRepeatedly();
-    void update_positions(QList<dVector3D> positions);
-    void set_animation_speed(double value);
+    void updatePositions(QList<dVector3D> positions);
+    void setAnimationSpeed(double value);
     //void calculatePositions(int year, int month, int day, int hours, int minutes, int seconds);
 
 signals:
     void new_date_input(QDateTime datetime);
 
 private:
-    // data for each planet.
-    QList<dVector3D> m_data;
-    QList<CelestialBody> m_bodies;
+    DataManager *data_manager;
     WorkerThread *m_workerThread;
-    int m_bodyCount;
     double scale_factor;
     Visualization visualization;
 };

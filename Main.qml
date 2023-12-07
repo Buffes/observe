@@ -9,12 +9,14 @@ import observe
 
 /*
 Todo list
+- rewrite planet repeater to use instancing like the star
+- selection of objects and information showing up.
+- texture for the stars
 - controls for heliocentric/geocentric
-- controls for animation speed and resolution
 - different sizes for the planets
 - astronomical map view (RA/declination)
 - make the sun into the scene's light source
-- textures for the planets
+- textures for the planets - 
 */
 
 Window {
@@ -24,10 +26,13 @@ Window {
     visible: true
     title: "Celestial Position Calculator"
     color: "#848895"
+    property var planetModel
+    property var starInstanceTable
+    property var selectionHandler
 
-    PlanetModel {
+    /*PlanetModel {
         id: coordinates_model
-    }
+    }*/
 
     Node {
         id: main_scene
@@ -54,7 +59,7 @@ Window {
 
             Model {
                 source: "#Sphere"
-                scale: Qt.vector3d(0.01, 0.01, 0.01)
+                scale: Qt.vector3d(0.1, 0.1, 0.1)
 
                 materials: [ DefaultMaterial {
                             diffuseColor: p_color
@@ -63,23 +68,8 @@ Window {
             }
         }
 
-        /*component StarDelegate : Node {
-            required property double x
-            required property double y
-            required property double z
-            position: Qt.vector3d(x, y, z)
-
-            Rectangle {
-                anchors.horizontalCenter: parent.horizontalCenter
-                color: "white"
-                width: 1
-                height: 1
-            }
-        }
-        */
-
         Repeater3D {
-            model: coordinates_model
+            model: window.planetModel
             delegate: PlanetDelegate {}
         }
 
@@ -93,7 +83,7 @@ Window {
         Model {
             id: instanced_star_quad
             source: "#Rectangle"
-            instancing: StarInstanceTable {}
+            instancing: window.starInstanceTable
             castsShadows: false
             castsReflections: false
 
@@ -144,7 +134,8 @@ Window {
                      }
 
             onClicked: event => {
-                           let clicked_point = main_view3d.mapTo3DScene(Qt.vector3d(event.x, event.y, test_field.text));
+                           let clickedPoint = main_view3d.mapTo3DScene(Qt.vector3d(event.x, event.y, 10.0));
+                           main_scene.selectionHandler.rayPick(camera.position, clickedPoint);
                        }
         }
 
@@ -181,7 +172,7 @@ Window {
                 MyCalendar {
                     id: calendar
                     anchors.horizontalCenter: parent.horizontalCenter
-                    onDateSelected: date => coordinates_model.calculatePositions(date)
+                    onDateSelected: date => window.planetModel.calculatePositions(date)
                     titleFont.bold: true
                     titleFont.pointSize: 13.0
                 }
@@ -203,13 +194,13 @@ Window {
                     //stepSize: 0.5
                     //snapMode: Slider.SnapOnRelease
 
-                    onMoved: coordinates_model.set_animation_speed(animation_speed_slider.value)
+                    onMoved: window.planetModel.setAnimationSpeed(animation_speed_slider.value)
                 }
 
                 Button {
                     text: "Start animation"
                     checkable: true
-                    onToggled: coordinates_model.calculatePositionsRepeatedly()
+                    onToggled: window.planetModel.calculatePositionsRepeatedly()
                 }
 
                 RadioButton {

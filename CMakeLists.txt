@@ -23,11 +23,13 @@ qt_add_qml_module(appobserve
     SOURCES starInstanceTable.h starInstanceTable.cpp
     SOURCES datastructures.h
     SOURCES selectionhandler.h selectionhandler.cpp
+    SOURCES el_math.h
+    SOURCES datamanager.h datamanager.cpp
+    SOURCES types.h
     QML_FILES
         Main.qml
         MyCalendar.qml
 )
-
 
 qt_add_resources(appobserve "assets"
     PREFIX "/img"

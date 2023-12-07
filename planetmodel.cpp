@@ -3,76 +3,19 @@
 #include <QFile>
 #include <QThread>
 
-PlanetModel::PlanetModel(QObject *parent) {
-    loadBodies("../observe/orbital_elements.txt");
-    m_data.reserve(m_bodyCount);
+PlanetModel::PlanetModel(QObject *parent):
+    QAbstractListModel(parent)
+{
+    this->data_manager = DataManager::getInstance();
+
     scale_factor = 25.0;
-    m_workerThread = new WorkerThread(m_bodies, QDateTime::currentDateTime());
+    m_workerThread = new WorkerThread(data_manager->m_planets, QDateTime::currentDateTime());
     QObject::connect(m_workerThread, &WorkerThread::new_positions,
-                     this, &PlanetModel::update_positions);
+                     this, &PlanetModel::updatePositions);
     QObject::connect(this, &PlanetModel::new_date_input,
                      m_workerThread, &WorkerThread::set_date);
 }
 
-void PlanetModel::loadBodies(QString path) {
-     QFile file(path);
-     if (!file.exists()) {
-         qWarning() << "Could not find file " << path;
-         return;
-     }
-     if (file.open(QFile::ReadOnly))  {
-         QTextStream in(&file);
-         CelestialBody current_body;
-         while (!in.atEnd()) {
-             QString line = in.readLine();
-             if (line.trimmed().length() == 0 || line.startsWith("//")) {
-                 continue; // skip empty lines and comments
-             }
-             if (line.startsWith("[")) {
-                 if (current_body.name.length() > 0) {
-                     this->m_bodies.push_back(current_body);
-                 }
-                 current_body = {0};
-                 current_body.name = line.sliced(1, line.length() - 2);
-             }
-             else {
-                 QStringList parts = line.split(",");
-                 QString element = parts[0];
-                 double base_value = parts[1].toDouble();
-                 double delta = parts[2].toDouble();
-                 if (element.startsWith("N")) {
-                     current_body.base_elements.N = base_value;
-                     current_body.delta.N = delta;
-                 }
-                 else if (element.startsWith("i")) {
-                     current_body.base_elements.i = base_value;
-                     current_body.delta.i = delta;
-                 }
-                 else if (element.startsWith("w")) {
-                     current_body.base_elements.w = base_value;
-                     current_body.delta.w = delta;
-                 }
-                 else if (element.startsWith("a")) {
-                     current_body.base_elements.a = base_value;
-                     current_body.delta.a = delta;
-                 }
-                 else if (element.startsWith("e")) {
-                     current_body.base_elements.e = base_value;
-                     current_body.delta.e = delta;
-                 }
-                 else if (element.startsWith("M")) {
-                     current_body.base_elements.M = base_value;
-                     current_body.delta.M = delta;
-                 }
-                 else if (element.startsWith("color")) {
-                     current_body.color = QColor(parts[1].toInt(), parts[2].toInt(), parts[3].toInt());
-                 }
-             }
-         }
-         this->m_bodies.push_back(current_body); // last item
-     }
-     this->m_bodyCount += this->m_bodies.size();
-}
 
 QHash<int, QByteArray> PlanetModel::roleNames() const {
     QHash<int, QByteArray> roles;
@@ -84,30 +27,30 @@ QHash<int, QByteArray> PlanetModel::roleNames() const {
 }
 
 int PlanetModel::rowCount(const QModelIndex& parent) const {
-    return m_data.size();
+    return data_manager->m_planet_positions.size();
 }
 
 QVariant PlanetModel::data(const QModelIndex& index, int role) const {
-    if (!index.isValid() || index.row() >= m_data.size())
+    if (!index.isValid() || index.row() >= data_manager->m_planet_positions.size())
         return QVariant();
     QVariant v;
     switch (role) {
-        // NOTE: QML seems to only support +Y as up. The math uses +Z. So we swap them here.
+        // NOTE: QML seems to only support +Y as up. The math uses +Z. So we convert systems here (swap Y and Z, and negate Z).
         case XRole:
-            return m_data[index.row()].x;
+            return data_manager->m_planet_positions[index.row()].x;
         case YRole:
-            return m_data[index.row()].z;
+            return data_manager->m_planet_positions[index.row()].z;
         case ZRole:
-            return m_data[index.row()].y;
+            return -data_manager->m_planet_positions[index.row()].y;
         case ColorRole:
-            v = m_bodies[index.row()].color;
+            v = data_manager->m_planets[index.row()].color;
             return v;
         default:
             return QVariant();
     }
 }
 
-void PlanetModel::update_positions(QList<dVector3D> positions) {
+void PlanetModel::updatePositions(QList<dVector3D> positions) {
     // scale positions for visualization purposes. units in are AU
     for (dVector3D &pos : positions) {
             pos.x *= scale_factor;
@@ -115,22 +58,22 @@ void PlanetModel::update_positions(QList<dVector3D> positions) {
             pos.z *= scale_factor;
     }
 
-    if (m_data.size() < positions.size()) {
-            beginInsertRows(QModelIndex(), m_data.size(), m_data.size() + positions.size() - 1);
-            this->m_data = positions;
+    if (data_manager->m_planet_positions.size() < positions.size()) {
+            beginInsertRows(QModelIndex(), data_manager->m_planet_positions.size(), data_manager->m_planet_positions.size() + positions.size() - 1);
+            this->data_manager->m_planet_positions = positions;
             endInsertRows();
     }
     else {
-            this->m_data = positions;
-            emit dataChanged(createIndex(0, 0), createIndex(m_data.size()-1, 0));
+            data_manager->m_planet_positions = positions;
+            emit dataChanged(createIndex(0, 0), createIndex(data_manager->m_planet_positions.size()-1, 0));
     }
 }
 
 void PlanetModel::calculatePositions(QDateTime datetime) {
     emit new_date_input(datetime);
     if (!m_workerThread->active) {
-        QList<dVector3D> positions = calc::calculatePositions(this->m_bodies, datetime);
-        update_positions(positions);
+            QList<dVector3D> positions = calc::calculatePositions(data_manager->m_planets, datetime);
+        updatePositions(positions);
     }
 }
 
@@ -141,6 +84,6 @@ void PlanetModel::calculatePositionsRepeatedly() {
         m_workerThread->disable();
 }
 
-void PlanetModel::set_animation_speed(double value) {
+void PlanetModel::setAnimationSpeed(double value) {
     m_workerThread->set_speed(value);
 }
