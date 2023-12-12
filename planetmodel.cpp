@@ -8,7 +8,7 @@ PlanetModel::PlanetModel(QObject *parent):
 {
     this->data_manager = DataManager::getInstance();
 
-    scale_factor = 25.0;
+    distance_from_center = 25.0;
     m_workerThread = new WorkerThread(data_manager->m_planets, QDateTime::currentDateTime());
     QObject::connect(m_workerThread, &WorkerThread::new_positions,
                      this, &PlanetModel::updatePositions);
@@ -16,13 +16,13 @@ PlanetModel::PlanetModel(QObject *parent):
                      m_workerThread, &WorkerThread::set_date);
 }
 
-
 QHash<int, QByteArray> PlanetModel::roleNames() const {
     QHash<int, QByteArray> roles;
     roles[XRole] = "x";
     roles[YRole] = "y";
     roles[ZRole] = "z";
     roles[ColorRole] = "p_color";
+    roles[RadiusRole] = "p_radius";
     return roles;
 }
 
@@ -33,7 +33,7 @@ int PlanetModel::rowCount(const QModelIndex& parent) const {
 QVariant PlanetModel::data(const QModelIndex& index, int role) const {
     if (!index.isValid() || index.row() >= data_manager->m_planet_positions.size())
         return QVariant();
-    QVariant v;
+
     switch (role) {
         // NOTE: QML seems to only support +Y as up. The math uses +Z. So we convert systems here (swap Y and Z, and negate Z).
         case XRole:
@@ -43,8 +43,9 @@ QVariant PlanetModel::data(const QModelIndex& index, int role) const {
         case ZRole:
             return -data_manager->m_planet_positions[index.row()].y;
         case ColorRole:
-            v = data_manager->m_planets[index.row()].color;
-            return v;
+            return data_manager->m_planets[index.row()].color;
+        case RadiusRole:
+            return data_manager->m_planets[index.row()].radius;
         default:
             return QVariant();
     }
@@ -53,14 +54,14 @@ QVariant PlanetModel::data(const QModelIndex& index, int role) const {
 void PlanetModel::updatePositions(QList<dVector3D> positions) {
     // scale positions for visualization purposes. units in are AU
     for (dVector3D &pos : positions) {
-            pos.x *= scale_factor;
-            pos.y *= scale_factor;
-            pos.z *= scale_factor;
+            pos.x *= distance_from_center;
+            pos.y *= distance_from_center;
+            pos.z *= distance_from_center;
     }
 
     if (data_manager->m_planet_positions.size() < positions.size()) {
             beginInsertRows(QModelIndex(), data_manager->m_planet_positions.size(), data_manager->m_planet_positions.size() + positions.size() - 1);
-            this->data_manager->m_planet_positions = positions;
+            data_manager->m_planet_positions = positions;
             endInsertRows();
     }
     else {

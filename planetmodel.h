@@ -90,6 +90,7 @@ public:
         YRole,
         ZRole,
         ColorRole,
+        RadiusRole,
     };
 
 public slots:
@@ -105,7 +106,7 @@ signals:
 private:
     DataManager *data_manager;
     WorkerThread *m_workerThread;
-    double scale_factor;
+    double distance_from_center;
     Visualization visualization;
 };
 

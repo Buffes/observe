@@ -281,7 +281,7 @@ dVector3D calc::RADeclinationToCartesian(double RA, double declination, double d
 
 float calc::magnitudeToScale(int16_t magnitude, int16_t max_magnitude) {
     // The magnitude scale is inverse logarithmic. We set a reference size for magnitude 1,
-    // and then calculate the color from the difference in magnitude.
+    // and then calculate a size from the difference in magnitude.
 
     float start_size = 0.02f;
     int16_t magnitude_diff = 100 - magnitude; // NOTE: the 16 bit number is 100 times the actual magnitude.

@@ -31,6 +31,7 @@ struct CelestialBody {
     OrbitalElements base_elements;
     OrbitalElements delta; // change per day since J2000
     QColor color;
+    float radius;
 };
 
 #endif // DATASTRUCTURES_H

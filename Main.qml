@@ -48,6 +48,7 @@ Window {
             required property double y
             required property double z
             required property color p_color;
+            required property real p_radius;
             position: Qt.vector3d(x, y, z)
 
             /*Text {
@@ -59,7 +60,7 @@ Window {
 
             Model {
                 source: "#Sphere"
-                scale: Qt.vector3d(0.1, 0.1, 0.1)
+                scale: Qt.vector3d(parent.p_radius, parent.p_radius, parent.p_radius)
 
                 materials: [ DefaultMaterial {
                             diffuseColor: p_color
@@ -134,8 +135,8 @@ Window {
                      }
 
             onClicked: event => {
-                           let clickedPoint = main_view3d.mapTo3DScene(Qt.vector3d(event.x, event.y, 10.0));
-                           main_scene.selectionHandler.rayPick(camera.position, clickedPoint);
+                           let ray = main_view3d.mapTo3DScene(Qt.vector3d(event.x, event.y, 0.0));
+                           window.selectionHandler.rayPick(camera.position, ray);
                        }
         }
 

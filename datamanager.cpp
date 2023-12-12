@@ -44,6 +44,7 @@ void DataManager::loadBodies(QString path) {
                 }
                 current_body = {0};
                 current_body.name = line.sliced(1, line.length() - 2);
+                current_body.radius = 0.01f;
             }
             else {
                 QStringList parts = line.split(",");
